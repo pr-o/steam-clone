@@ -1,0 +1,23 @@
+{
+  "name": "steam-clone",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check"
+  },
+  "devDependencies": {
+    "mupdf": "^1.27.0",
+    "turbo": "latest",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@10.6.5",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild",
+      "sharp"
+    ]
+  }
+}

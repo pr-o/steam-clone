@@ -1,0 +1,193 @@
+{
+  "_note": "Extracted from Steam Brand Guidelines PDF + live store screenshots (March 2026)",
+
+  "colors": {
+    "_note": "All hex values sampled from reference screenshots and official brand guidelines",
+
+    "backgrounds": {
+      "pageBase":       "#171a21",
+      "navPrimary":     "#171a21",
+      "contentDark":    "#1b2838",
+      "cardBase":       "#16202d",
+      "cardHover":      "#1e3040",
+      "sidebarPanel":   "#2a475e",
+      "inputField":     "#316282",
+      "storeBanner":    "#1e2837"
+    },
+
+    "text": {
+      "primary":        "#c7d5e0",
+      "secondary":      "#8f98a0",
+      "dimmed":         "#738895",
+      "link":           "#66c0f4",
+      "linkHover":      "#acdbf5",
+      "navActive":      "#ffffff",
+      "navDefault":     "#c6d4df"
+    },
+
+    "brand": {
+      "steamCerulean":  "#00adee",
+      "steamBlue":      "#1a9fff",
+      "accentLight":    "#66c0f4",
+      "accentPale":     "#acdbf5"
+    },
+
+    "interactive": {
+      "buttonPrimary":       "#4c7b8a",
+      "buttonPrimaryHover":  "#67c1f5",
+      "buttonGreen":         "#5c7e10",
+      "buttonGreenHover":    "#a4d007",
+      "installButton":       "#5dade2",
+      "installButtonHover":  "#1a9fff"
+    },
+
+    "price": {
+      "discountBadgeBg":     "#4c6b22",
+      "discountBadgeText":   "#a4d007",
+      "originalPrice":       "#738895",
+      "salePrice":           "#acdbf5",
+      "freeText":            "#acdbf5"
+    },
+
+    "review": {
+      "overwhelminglyPositive": "#66c0f4",
+      "veryPositive":           "#66c0f4",
+      "mostlyPositive":         "#66c0f4",
+      "mixed":                  "#b9a074",
+      "negative":               "#c34741"
+    },
+
+    "status": {
+      "online":    "#57cbde",
+      "inGame":    "#90ba3c",
+      "away":      "#57cbde",
+      "offline":   "#898989"
+    },
+
+    "border": {
+      "subtle":    "#2a3f5a",
+      "medium":    "#4b6a8b",
+      "strong":    "#67c1f5"
+    }
+  },
+
+  "typography": {
+    "primary":   "Motiva Sans",
+    "logoFont":  "FF Din Bold",
+    "fallback":  "Arial, Helvetica, sans-serif",
+
+    "scale": {
+      "xs":   "11px",
+      "sm":   "12px",
+      "base": "13px",
+      "md":   "14px",
+      "lg":   "16px",
+      "xl":   "18px",
+      "2xl":  "24px",
+      "3xl":  "28px",
+      "4xl":  "36px"
+    },
+
+    "weights": {
+      "regular": 400,
+      "medium":  500,
+      "bold":    700
+    }
+  },
+
+  "layout": {
+    "maxWidth":          "1190px",
+    "navHeight":         "36px",
+    "subnavHeight":      "36px",
+    "borderRadius": {
+      "none":   "0px",
+      "sm":     "2px",
+      "base":   "3px",
+      "md":     "4px",
+      "lg":     "6px"
+    }
+  },
+
+  "navigation": {
+    "topBar": {
+      "bg":       "#171a21",
+      "links":    ["STORE", "COMMUNITY", "ABOUT", "SUPPORT"],
+      "cta":      "Install Steam"
+    },
+    "subNav": {
+      "bg":       "#171a21",
+      "items":    ["Browse", "Recommendations", "Categories", "Hardware", "Ways to Play", "Special Sections"],
+      "hasSearch": true
+    }
+  },
+
+  "pages": {
+    "home": {
+      "sections": [
+        "Hero carousel (full-width featured game/event)",
+        "Featured & Recommended (horizontal scroll cards)",
+        "Specials / Discounts grid",
+        "Top Sellers (tabs: New Releases / Upcoming / Trending Free) with right-side preview panel",
+        "Top Played on Steam Deck carousel",
+        "Discovery Queue",
+        "Recently Updated (owned games)"
+      ]
+    },
+    "gamePage": {
+      "layout": "Two-column: left = media (screenshots/video carousel + description), right = buy box + metadata sidebar",
+      "rightSidebar": ["Header art", "Short description", "Review score", "Release date", "Developer/Publisher", "Buy button", "Tags"],
+      "bottomSections": ["About This Game", "System Requirements", "Reviews", "Recent Updates", "DLC", "Content Warning"]
+    },
+    "search": {
+      "layout": "Two-column: left = results list (460px wide items), right = filter sidebar",
+      "sortOptions": ["Relevance", "Release Date", "Name", "Lowest Price", "Highest Price", "User Reviews", "Steam Reviews"]
+    },
+    "cart": {
+      "layout": "Two-column: left = cart items, right = estimated total + checkout CTA",
+      "emptyState": "Shows recommendations below empty cart message"
+    },
+    "login": {
+      "layout": "Centered card over blurred game art background, two-column: left = account form, right = QR code"
+    },
+    "pointsShop": {
+      "layout": "Two-column: left = category sidebar, right = item grid with point costs shown in coin icon"
+    }
+  },
+
+  "components": {
+    "gameCard": {
+      "sizes": {
+        "capsule": "184×69px (small list thumbnail)",
+        "header":  "460×215px (standard store card)",
+        "hero":    "616×353px (featured/large)"
+      },
+      "elements": ["Game art", "Title", "Price/Discount badge", "Review score (on hover)", "Platform icons"]
+    },
+    "discountBadge": {
+      "bg":        "#4c6b22",
+      "text":      "#a4d007",
+      "format":    "-XX%",
+      "fontSize":  "12px",
+      "fontWeight": 700
+    },
+    "reviewBadge": {
+      "format":    "Overwhelmingly Positive (97,277)",
+      "subtext":   "X% of the X user reviews for this game are positive"
+    },
+    "button": {
+      "primary":   { "bg": "#4c7b8a", "hover": "#67c1f5", "text": "#ffffff" },
+      "addToCart": { "bg": "#4c7b8a", "hover": "#67c1f5", "text": "#ffffff" },
+      "buyNow":    { "bg": "#5c7e10", "hover": "#a4d007", "text": "#ffffff" },
+      "install":   { "bg": "#00adee", "hover": "#1a9fff", "text": "#ffffff" }
+    }
+  },
+
+  "logo": {
+    "positiveLogoColors": { "rgb": "0 0 0", "cmyk": "0 0 0 100" },
+    "inverseLogoColors":  { "rgb": "255 255 255", "cmyk": "0 0 0 0" },
+    "minimumPrintSize":   "12.5mm",
+    "minimumScreenSize":  "50px",
+    "clearSpace":         "diameter of the locomotive crank symbol",
+    "logoFiles":          "Available at Adobe Illustrator (.ai) assets from Valve"
+  }
+}
