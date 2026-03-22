@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Always Do First
 
-- **Invoke the `frontend-design` skill** before writing any frontend code, every session, no exceptions.
+- **Invoke the `frontend-design` and `React Best Practices` skills** before writing any frontend code, every session, no exceptions.
 
 ## Project
 
@@ -39,6 +39,33 @@ All packages export TypeScript source directly (`"main": "./src/index.ts"`). Nex
 | Build all          | `pnpm build`                             |
 | Type-check all     | `pnpm type-check`                        |
 | Lint all           | `pnpm lint`                              |
+
+## Libraries
+
+| Purpose | Library | Notes |
+|---|---|---|
+| UI components | shadcn/ui | Installed per-app (web + desktop); CSS vars themed with Steam tokens |
+| State management | Jotai | Atoms in `src/stores/`; client-only state (cart, wishlist, UI, user session) |
+| Server state / data fetching | TanStack React Query v5 | `useQuery` / `useMutation`; hooks in `src/hooks/`; `staleTime: 60_000` |
+| API mocking | MSW v2 | Handlers in `src/mocks/handlers/`; seed data in `src/mocks/data/`; dev-only |
+
+### Provider nesting order (both apps)
+```tsx
+<QueryClientProvider client={queryClient}>
+  <Provider>        {/* Jotai */}
+    {children}
+  </Provider>
+</QueryClientProvider>
+```
+
+### MSW locations
+- **Web:** `apps/web/public/mockServiceWorker.js` + `apps/web/src/mocks/`
+- **Desktop:** `apps/desktop/src/renderer/public/mockServiceWorker.js` + `apps/desktop/src/renderer/src/mocks/`
+
+### Data philosophy
+- All fetched-looking data (games, reviews, user) goes through **MSW + React Query** — never hardcode it in components.
+- Client-only state (cart contents, wishlist, active UI tab) lives in **Jotai atoms**.
+- Images/text are placeholders (`https://placehold.co/{W}x{H}/1b2838/66c0f4?text=Label`) unless real assets are in `brand-assets/`.
 
 ## UI Guidelines
 
@@ -78,22 +105,23 @@ All packages export TypeScript source directly (`"main": "./src/index.ts"`). Nex
 
 ### Key colors (quick reference)
 
-| Token | Hex | Usage |
-|---|---|---|
-| `backgrounds.pageBase` | `#171a21` | Page / nav background |
-| `backgrounds.contentDark` | `#1b2838` | Content panels |
-| `backgrounds.cardBase` | `#16202d` | Game cards |
+| Token                      | Hex       | Usage                      |
+| -------------------------- | --------- | -------------------------- |
+| `backgrounds.pageBase`     | `#171a21` | Page / nav background      |
+| `backgrounds.contentDark`  | `#1b2838` | Content panels             |
+| `backgrounds.cardBase`     | `#16202d` | Game cards                 |
 | `backgrounds.sidebarPanel` | `#2a475e` | Sidebar / secondary panels |
-| `brand.steamCerulean` | `#00adee` | Official Steam brand blue |
-| `brand.steamBlue` | `#1a9fff` | Interactive accent blue |
-| `brand.accentLight` | `#66c0f4` | Links, highlights |
-| `text.primary` | `#c7d5e0` | Body text |
-| `text.secondary` | `#8f98a0` | Metadata, dimmed labels |
-| `price.discountBadgeBg` | `#4c6b22` | Discount badge background |
-| `price.discountBadgeText` | `#a4d007` | Discount percentage text |
-| `price.salePrice` | `#acdbf5` | Final/sale price |
+| `brand.steamCerulean`      | `#00adee` | Official Steam brand blue  |
+| `brand.steamBlue`          | `#1a9fff` | Interactive accent blue    |
+| `brand.accentLight`        | `#66c0f4` | Links, highlights          |
+| `text.primary`             | `#c7d5e0` | Body text                  |
+| `text.secondary`           | `#8f98a0` | Metadata, dimmed labels    |
+| `price.discountBadgeBg`    | `#4c6b22` | Discount badge background  |
+| `price.discountBadgeText`  | `#a4d007` | Discount percentage text   |
+| `price.salePrice`          | `#acdbf5` | Final/sale price           |
 
 ### Typography
+
 - **Primary font:** Motiva Sans (load from Google Fonts or Adobe Fonts; fall back to `Arial, Helvetica, sans-serif`)
 - **Logo font:** FF Din Bold
 - Base size: 13px; nav/labels: 11–12px; headings: 18–36px
