@@ -10,6 +10,7 @@ import { addToCartAtom } from '@/stores/cartStore'
 import { toggleWishlistAtom, isWishlistedAtom } from '@/stores/wishlistStore'
 import { isSignedInAtom } from '@/stores/userStore'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import type { Game, Review } from '@steam-clone/types'
 
@@ -134,20 +135,23 @@ function MediaCarousel({ game }: { game: Game }) {
       </div>
 
       {/* Thumbnail strip */}
-      <div className="flex gap-1 mt-1 overflow-x-auto scrollbar-none bg-[#0e1825] p-1">
-        {media.map((src, i) => (
-          <button
-            key={i}
-            onClick={() => setActiveIdx(i)}
-            className={cn(
-              'shrink-0 w-[116px] h-[65px] overflow-hidden rounded-sm border-2 transition-colors',
-              activeIdx === i ? 'border-steam-blue' : 'border-transparent opacity-60 hover:opacity-100'
-            )}
-          >
-            <img src={src} alt="" className="w-full h-full object-cover" />
-          </button>
-        ))}
-      </div>
+      <ScrollArea className="bg-[#0e1825] mt-1">
+        <div className="flex gap-1 p-1">
+          {media.map((src, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveIdx(i)}
+              className={cn(
+                'shrink-0 w-[116px] h-[65px] overflow-hidden rounded-sm border-2 transition-colors',
+                activeIdx === i ? 'border-steam-blue' : 'border-transparent opacity-60 hover:opacity-100'
+              )}
+            >
+              <img src={src} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
     </div>
   )
 }

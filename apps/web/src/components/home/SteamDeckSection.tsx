@@ -3,15 +3,17 @@
 import { useRef } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area'
 import { useAllGames } from '@/hooks/useGames'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ScrollBar } from '@/components/ui/scroll-area'
 
 export function SteamDeckSection() {
   const { data: games, isLoading } = useAllGames()
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
 
   function scroll(dir: 'left' | 'right') {
-    scrollRef.current?.scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' })
+    viewportRef.current?.scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' })
   }
 
   return (
@@ -38,33 +40,39 @@ export function SteamDeckSection() {
           <ChevronLeft size={22} className="text-white drop-shadow" />
         </button>
 
-        <div ref={scrollRef} className="flex gap-1.5 overflow-x-auto scrollbar-none">
-          {isLoading
-            ? Array.from({ length: 7 }).map((_, i) => (
-                <Skeleton key={i} className="w-[184px] h-[69px] shrink-0 rounded-sm bg-steam-card" />
-              ))
-            : games?.slice(0, 10).map(game => (
-                <Link
-                  key={game.id}
-                  href={`/app/${game.id}/${game.slug}`}
-                  className="shrink-0 w-[184px] group/card"
-                >
-                  <div className="relative overflow-hidden rounded-sm">
-                    <img
-                      src={game.headerImage}
-                      alt={game.title}
-                      className="w-full h-[69px] object-cover group-hover/card:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    {game.price.discountPercent > 0 && (
-                      <span className="absolute bottom-1 right-1 bg-steam-discountBg text-steam-discountText text-[10px] font-bold px-1.5 py-0.5 rounded-sm leading-none">
-                        -{game.price.discountPercent}%
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              ))}
-        </div>
+        <ScrollAreaPrimitive.Root className="relative overflow-hidden">
+          <ScrollAreaPrimitive.Viewport ref={viewportRef} className="w-full">
+            <div className="flex gap-1.5 pb-2">
+              {isLoading
+                ? Array.from({ length: 7 }).map((_, i) => (
+                    <Skeleton key={i} className="w-[184px] h-[69px] shrink-0 rounded-sm bg-steam-card" />
+                  ))
+                : games?.slice(0, 10).map(game => (
+                    <Link
+                      key={game.id}
+                      href={`/app/${game.id}/${game.slug}`}
+                      className="shrink-0 w-[184px] group/card"
+                    >
+                      <div className="relative overflow-hidden rounded-sm">
+                        <img
+                          src={game.headerImage}
+                          alt={game.title}
+                          className="w-full h-[69px] object-cover group-hover/card:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                        {game.price.discountPercent > 0 && (
+                          <span className="absolute bottom-1 right-1 bg-steam-discountBg text-steam-discountText text-[10px] font-bold px-1.5 py-0.5 rounded-sm leading-none">
+                            -{game.price.discountPercent}%
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+            </div>
+          </ScrollAreaPrimitive.Viewport>
+          <ScrollBar orientation="horizontal" />
+          <ScrollAreaPrimitive.Corner />
+        </ScrollAreaPrimitive.Root>
 
         <button
           onClick={() => scroll('right')}

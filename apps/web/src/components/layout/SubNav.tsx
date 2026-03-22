@@ -5,6 +5,7 @@ import { useAtom } from 'jotai'
 import { Search, ChevronDown } from 'lucide-react'
 import { searchQueryAtom } from '@/stores/uiStore'
 import { isSignedInAtom } from '@/stores/userStore'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
 const BROWSE_ITEMS = [
@@ -31,8 +32,8 @@ export function SubNav() {
   return (
     <div className="fixed top-9 left-0 right-0 z-40 h-9 bg-steam-bg border-b border-black/40 flex items-center">
       {/* Horizontally scrollable on mobile */}
-      <div className="flex items-center h-full overflow-x-auto scrollbar-none flex-1 min-w-0">
-        <div className="flex items-center h-full shrink-0">
+      <ScrollArea className="flex-1 min-w-0 h-full">
+        <div className="flex items-center h-9 shrink-0">
           {BROWSE_ITEMS.map(({ label, hasDropdown }) => (
             <button
               key={label}
@@ -49,7 +50,8 @@ export function SubNav() {
             </button>
           )}
         </div>
-      </div>
+        <ScrollBar orientation="horizontal" className="h-1" />
+      </ScrollArea>
 
       {/* Search */}
       <form

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useFeaturedGames } from '@/hooks/useGames'
 import { GameCard } from '@steam-clone/ui'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 export function FeaturedRow() {
   const { data: games, isLoading } = useFeaturedGames()
@@ -24,23 +25,26 @@ export function FeaturedRow() {
         </Link>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="w-[220px] shrink-0">
-                <Skeleton className="w-full h-[103px] rounded-sm bg-steam-card" />
-                <Skeleton className="w-full h-[56px] rounded-sm bg-steam-card mt-0.5" />
-              </div>
-            ))
-          : games?.map(game => (
-              <div key={game.id} className="w-[220px] shrink-0">
-                <GameCard
-                  game={game}
-                  onClick={g => router.push(`/app/${g.id}/${g.slug}`)}
-                />
-              </div>
-            ))}
-      </div>
+      <ScrollArea>
+        <div className="flex gap-2 pb-2">
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="w-[220px] shrink-0">
+                  <Skeleton className="w-full h-[103px] rounded-sm bg-steam-card" />
+                  <Skeleton className="w-full h-[56px] rounded-sm bg-steam-card mt-0.5" />
+                </div>
+              ))
+            : games?.map(game => (
+                <div key={game.id} className="w-[220px] shrink-0">
+                  <GameCard
+                    game={game}
+                    onClick={g => router.push(`/app/${g.id}/${g.slug}`)}
+                  />
+                </div>
+              ))}
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
     </section>
   )
 }

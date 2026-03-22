@@ -6,6 +6,7 @@ import { useAllGames } from '@/hooks/useGames'
 import { useSetAtom } from 'jotai'
 import { addToCartAtom } from '@/stores/cartStore'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import type { Game } from '@steam-clone/types'
 
@@ -105,7 +106,8 @@ function PreviewPanel({ game }: { game: Game }) {
       </div>
 
       {/* Body */}
-      <div className="flex flex-col flex-1 p-3 gap-2 overflow-auto">
+      <ScrollArea className="flex-1">
+      <div className="flex flex-col p-3 gap-2">
         {/* Rating */}
         <div>
           <p className="text-steam-textDim text-[10px] mb-0.5">
@@ -163,6 +165,7 @@ function PreviewPanel({ game }: { game: Game }) {
           </div>
         </div>
       </div>
+      </ScrollArea>
     </div>
   )
 }
