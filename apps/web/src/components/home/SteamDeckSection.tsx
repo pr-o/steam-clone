@@ -1,0 +1,79 @@
+'use client'
+
+import { useRef } from 'react'
+import Link from 'next/link'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useAllGames } from '@/hooks/useGames'
+import { Skeleton } from '@/components/ui/skeleton'
+
+export function SteamDeckSection() {
+  const { data: games, isLoading } = useAllGames()
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  function scroll(dir: 'left' | 'right') {
+    scrollRef.current?.scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' })
+  }
+
+  return (
+    <section className="py-3">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-steam-text text-[13px]">⊙</span>
+        <h2 className="text-steam-navActive text-[13px] font-normal uppercase tracking-[0.12em] flex-1">
+          Top Played on Steam Deck
+        </h2>
+        <Link
+          href="/steamdeck"
+          className="text-[12px] text-steam-link hover:text-steam-linkHover transition-colors"
+        >
+          See More
+        </Link>
+      </div>
+
+      <div className="relative group/deck">
+        <button
+          onClick={() => scroll('left')}
+          className="absolute left-0 top-0 bottom-0 z-10 w-10 flex items-center justify-start pl-1 bg-gradient-to-r from-steam-bg to-transparent opacity-0 group-hover/deck:opacity-100 transition-opacity"
+          aria-label="Scroll left"
+        >
+          <ChevronLeft size={22} className="text-white drop-shadow" />
+        </button>
+
+        <div ref={scrollRef} className="flex gap-1.5 overflow-x-auto scrollbar-none">
+          {isLoading
+            ? Array.from({ length: 7 }).map((_, i) => (
+                <Skeleton key={i} className="w-[184px] h-[69px] shrink-0 rounded-sm bg-steam-card" />
+              ))
+            : games?.slice(0, 10).map(game => (
+                <Link
+                  key={game.id}
+                  href={`/app/${game.id}/${game.slug}`}
+                  className="shrink-0 w-[184px] group/card"
+                >
+                  <div className="relative overflow-hidden rounded-sm">
+                    <img
+                      src={game.headerImage}
+                      alt={game.title}
+                      className="w-full h-[69px] object-cover group-hover/card:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    {game.price.discountPercent > 0 && (
+                      <span className="absolute bottom-1 right-1 bg-steam-discountBg text-steam-discountText text-[10px] font-bold px-1.5 py-0.5 rounded-sm leading-none">
+                        -{game.price.discountPercent}%
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+        </div>
+
+        <button
+          onClick={() => scroll('right')}
+          className="absolute right-0 top-0 bottom-0 z-10 w-10 flex items-center justify-end pr-1 bg-gradient-to-l from-steam-bg to-transparent opacity-0 group-hover/deck:opacity-100 transition-opacity"
+          aria-label="Scroll right"
+        >
+          <ChevronRight size={22} className="text-white drop-shadow" />
+        </button>
+      </div>
+    </section>
+  )
+}
