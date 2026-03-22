@@ -8,6 +8,10 @@ import { currentUserAtom } from '@/stores/userStore'
 import { MOCK_USER } from '@/mocks/data/users'
 import { MOCK_GAMES } from '@/mocks/data/games'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 
 // A fixed grid of game header images for the blurred background
 const BG_GAMES = MOCK_GAMES.slice(0, 20)
@@ -74,10 +78,10 @@ export default function LoginPage() {
             {/* Left: form */}
             <form onSubmit={handleSubmit} className="flex-1 min-w-0 flex flex-col gap-3">
               <div>
-                <label className="block text-steam-textDim text-[11px] uppercase tracking-wider mb-1">
+                <Label className="block text-steam-textDim text-[11px] uppercase tracking-wider mb-1">
                   Sign in with account name
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={username}
                   onChange={e => { setUsername(e.target.value); setError('') }}
@@ -87,10 +91,10 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="block text-steam-textDim text-[11px] uppercase tracking-wider mb-1">
+                <Label className="block text-steam-textDim text-[11px] uppercase tracking-wider mb-1">
                   Password
-                </label>
-                <input
+                </Label>
+                <Input
                   type="password"
                   value={password}
                   onChange={e => { setPassword(e.target.value); setError('') }}
@@ -99,26 +103,29 @@ export default function LoginPage() {
                 />
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+              <div className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  id="remember"
                   checked={remember}
-                  onChange={e => setRemember(e.target.checked)}
+                  onCheckedChange={checked => setRemember(checked === true)}
                   className="w-3.5 h-3.5 rounded-sm accent-steam-blue"
                 />
-                <span className="text-steam-textMuted text-[12px]">Remember me</span>
-              </label>
+                <Label htmlFor="remember" className="text-steam-textMuted text-[12px] cursor-pointer">
+                  Remember me
+                </Label>
+              </div>
 
               {error && (
                 <p className="text-[#c34741] text-[12px]">{error}</p>
               )}
 
-              <button
+              <Button
                 type="submit"
+                variant="ghost"
                 className="w-full h-[34px] bg-steam-blue hover:bg-steam-cerulean text-white text-[13px] font-semibold rounded-sm transition-colors"
               >
                 Sign In
-              </button>
+              </Button>
 
               <div className="text-center">
                 <Link

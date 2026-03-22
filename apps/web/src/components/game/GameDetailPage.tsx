@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { ThumbsUp, ThumbsDown, Monitor, Apple, X as Linux, ChevronLeft, ChevronRight, Heart, ShoppingCart } from 'lucide-react'
+import { ThumbsUp, ThumbsDown, ChevronLeft, ChevronRight, Heart, ShoppingCart } from 'lucide-react'
 import { useGame } from '@/hooks/useGames'
 import { useGameReviews } from '@/hooks/useReviews'
 import { addToCartAtom } from '@/stores/cartStore'
@@ -11,40 +11,15 @@ import { toggleWishlistAtom, isWishlistedAtom } from '@/stores/wishlistStore'
 import { isSignedInAtom } from '@/stores/userStore'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { getRatingColor } from '@/lib/utils'
+import { RatingBadge } from '@/components/shared/RatingBadge'
+import { PriceDisplay } from '@/components/shared/PriceDisplay'
+import { PlatformIcons } from '@/components/shared/PlatformIcons'
 import type { Game, Review } from '@steam-clone/types'
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-const RATING_COLOR: Record<string, string> = {
-  'Overwhelmingly Positive': '#66c0f4',
-  'Very Positive': '#66c0f4',
-  'Mostly Positive': '#66c0f4',
-  Mixed: '#b9a074',
-  'Mostly Negative': '#c34741',
-  'Very Negative': '#c34741',
-  'Overwhelmingly Negative': '#c34741',
-}
-
-function ratingColor(summary: string) {
-  return RATING_COLOR[summary] ?? '#66c0f4'
-}
-
-function formatPrice(cents: number) {
-  return `$${(cents / 100).toFixed(2)}`
-}
-
 // ─── Sub-components ─────────────────────────────────────────────────────────
-
-function PlatformIcons({ platforms }: { platforms: Game['platforms'] }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      {platforms.windows && <Monitor size={13} className="text-steam-textMuted" />}
-      {platforms.mac && <Apple size={13} className="text-steam-textMuted" />}
-      {platforms.linux && <Linux size={13} className="text-steam-textMuted" />}
-    </div>
-  )
-}
 
 function PriceBlock({ game }: { game: Game }) {
   const addToCart = useSetAtom(addToCartAtom)
@@ -64,35 +39,33 @@ function PriceBlock({ game }: { game: Game }) {
   if (game.price.discountPercent > 0) {
     return (
       <div className="mt-4">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="bg-steam-discountBg text-steam-discountText text-[14px] font-bold px-2 py-1 rounded-sm">
-            -{game.price.discountPercent}%
-          </span>
-          <div className="flex flex-col leading-none">
-            <span className="text-steam-textDim text-[11px] line-through">{formatPrice(game.price.initial)}</span>
-            <span className="text-steam-salePrice font-bold text-[16px]">{formatPrice(game.price.final)}</span>
-          </div>
+        <div className="mb-2">
+          <PriceDisplay price={game.price} size="lg" />
         </div>
-        <button
+        <Button
+          variant="ghost"
           onClick={() => addToCart(game)}
           className="w-full text-[13px] font-semibold text-white bg-[#5c7e10] hover:bg-[#6b9313] py-2 rounded-sm transition-colors flex items-center justify-center gap-2"
         >
           <ShoppingCart size={14} />
           Add to Cart
-        </button>
+        </Button>
       </div>
     )
   }
   return (
     <div className="mt-4">
-      <div className="text-steam-text font-bold text-[16px] mb-2">{formatPrice(game.price.final)}</div>
-      <button
+      <div className="mb-2">
+        <PriceDisplay price={game.price} size="lg" />
+      </div>
+      <Button
+        variant="ghost"
         onClick={() => addToCart(game)}
         className="w-full text-[13px] font-semibold text-white bg-[#5c7e10] hover:bg-[#6b9313] py-2 rounded-sm transition-colors flex items-center justify-center gap-2"
       >
         <ShoppingCart size={14} />
         Add to Cart
-      </button>
+      </Button>
     </div>
   )
 }
@@ -118,18 +91,20 @@ function MediaCarousel({ game }: { game: Game }) {
         />
         {media.length > 1 && (
           <>
-            <button
+            <Button
+              variant="ghost"
               onClick={prev}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <ChevronLeft size={18} className="text-white" />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
               onClick={next}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
             >
               <ChevronRight size={18} className="text-white" />
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -138,16 +113,17 @@ function MediaCarousel({ game }: { game: Game }) {
       <ScrollArea className="bg-[#0e1825] mt-1">
         <div className="flex gap-1 p-1">
           {media.map((src, i) => (
-            <button
+            <Button
               key={i}
+              variant="ghost"
               onClick={() => setActiveIdx(i)}
               className={cn(
-                'shrink-0 w-[116px] h-[65px] overflow-hidden rounded-sm border-2 transition-colors',
+                'shrink-0 w-[116px] h-[65px] overflow-hidden rounded-sm border-2 transition-colors p-0',
                 activeIdx === i ? 'border-steam-blue' : 'border-transparent opacity-60 hover:opacity-100'
               )}
             >
               <img src={src} alt="" className="w-full h-full object-cover" />
-            </button>
+            </Button>
           ))}
         </div>
         <ScrollBar orientation="horizontal" />
@@ -161,8 +137,6 @@ function MediaCarousel({ game }: { game: Game }) {
 function GameSidebar({ game }: { game: Game }) {
   const isWishlisted = useAtomValue(useMemo(() => isWishlistedAtom(game.id), [game.id]))
   const toggleWishlist = useSetAtom(toggleWishlistAtom)
-  const rc = ratingColor(game.rating.summary)
-  const genre = game.genres[0]?.description ?? 'Game'
 
   return (
     <div className="flex flex-col gap-3">
@@ -183,15 +157,21 @@ function GameSidebar({ game }: { game: Game }) {
       <div className="flex flex-col gap-1.5 text-[12px]">
         <div className="flex justify-between">
           <span className="text-steam-textDim uppercase tracking-wide text-[10px]">Recent Reviews:</span>
-          <span style={{ color: rc }} className="font-medium">
-            {game.rating.summary} ({game.rating.totalReviews.toLocaleString()})
-          </span>
+          <RatingBadge
+            summary={game.rating.summary}
+            score={game.rating.totalReviews}
+            showScore
+            className="font-medium text-[12px]"
+          />
         </div>
         <div className="flex justify-between">
           <span className="text-steam-textDim uppercase tracking-wide text-[10px]">All Reviews:</span>
-          <span style={{ color: rc }} className="font-medium">
-            {game.rating.summary} ({(game.rating.totalReviews * 8).toLocaleString()})
-          </span>
+          <RatingBadge
+            summary={game.rating.summary}
+            score={game.rating.totalReviews * 8}
+            showScore
+            className="font-medium text-[12px]"
+          />
         </div>
       </div>
 
@@ -232,7 +212,8 @@ function GameSidebar({ game }: { game: Game }) {
       <PriceBlock game={game} />
 
       {/* Wishlist */}
-      <button
+      <Button
+        variant="ghost"
         onClick={() => toggleWishlist(game.id)}
         className={cn(
           'w-full text-[12px] py-1.5 rounded-sm border transition-colors flex items-center justify-center gap-1.5',
@@ -243,11 +224,11 @@ function GameSidebar({ game }: { game: Game }) {
       >
         <Heart size={13} className={isWishlisted ? 'fill-steam-blue' : ''} />
         {isWishlisted ? 'On Wishlist' : 'Add to Wishlist'}
-      </button>
+      </Button>
 
       {/* Platform icons */}
       <div className="flex items-center gap-2 pt-1">
-        <PlatformIcons platforms={game.platforms} />
+        <PlatformIcons platforms={game.platforms} size={13} />
       </div>
     </div>
   )
@@ -280,9 +261,12 @@ function UpdatesSection({ game }: { game: Game }) {
           </div>
         ))}
       </div>
-      <button className="text-steam-link hover:text-steam-linkHover text-[12px] transition-colors flex items-center gap-1">
+      <Button
+        variant="ghost"
+        className="text-steam-link hover:text-steam-linkHover text-[12px] transition-colors flex items-center gap-1 p-0 h-auto"
+      >
         ↻ See all updates (Latest: Mar 19)
-      </button>
+      </Button>
     </div>
   )
 }
@@ -326,12 +310,13 @@ function InfoSidebar({ game }: { game: Game }) {
       {/* Action links */}
       <div className="flex flex-col gap-0.5">
         {['Visit the website', 'View update history', 'Read related news', 'View discussions', 'Visit the Workshop', 'Find Community Groups'].map(link => (
-          <button
+          <Button
             key={link}
-            className="text-left text-[12px] text-steam-link hover:text-steam-linkHover px-2 py-1.5 rounded-sm hover:bg-steam-card transition-colors"
+            variant="ghost"
+            className="text-left text-[12px] text-steam-link hover:text-steam-linkHover px-2 py-1.5 rounded-sm hover:bg-steam-card transition-colors justify-start h-auto"
           >
             {link}
-          </button>
+          </Button>
         ))}
       </div>
     </div>
@@ -439,12 +424,18 @@ function ReviewCard({ review }: { review: Review }) {
       <p className="text-steam-textMuted text-[12px] leading-relaxed line-clamp-5">{review.content}</p>
       <div className="flex items-center gap-3 pt-1 border-t border-steam-borderSubtle text-[11px] text-steam-textDim">
         <span>Was this review helpful?</span>
-        <button className="flex items-center gap-1 hover:text-steam-text transition-colors">
+        <Button
+          variant="ghost"
+          className="flex items-center gap-1 hover:text-steam-text transition-colors p-0 h-auto text-[11px] text-steam-textDim"
+        >
           <ThumbsUp size={11} /> Yes ({review.helpful})
-        </button>
-        <button className="flex items-center gap-1 hover:text-steam-text transition-colors">
+        </Button>
+        <Button
+          variant="ghost"
+          className="flex items-center gap-1 hover:text-steam-text transition-colors p-0 h-auto text-[11px] text-steam-textDim"
+        >
           Funny ({review.funny})
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -454,7 +445,7 @@ function ReviewCard({ review }: { review: Review }) {
 
 function ReviewsSection({ game }: { game: Game }) {
   const { data: reviews, isLoading } = useGameReviews(game.id)
-  const rc = ratingColor(game.rating.summary)
+  const rc = getRatingColor(game.rating.summary)
 
   return (
     <div className="mt-8">
@@ -506,7 +497,12 @@ function SignInBar() {
         <Link href="/login" className="text-steam-link hover:text-steam-linkHover transition-colors">Sign in</Link>
         {' '}to add this item to your wishlist, follow it, or mark it as ignored.
       </p>
-      <button className="text-steam-textMuted hover:text-steam-text transition-colors ml-4">✕</button>
+      <Button
+        variant="ghost"
+        className="text-steam-textMuted hover:text-steam-text transition-colors ml-4 p-0 h-auto"
+      >
+        ✕
+      </Button>
     </div>
   )
 }
@@ -558,9 +554,12 @@ export function GameDetailPage({ gameId }: { gameId: number }) {
       {/* "Not signed in" desktop app banner */}
       <div className="bg-[#1b4d6e] border-b border-[#4a7a9b]">
         <div className="max-w-[940px] mx-auto px-4 sm:px-0 py-1.5 flex items-center gap-3">
-          <button className="text-[11px] font-semibold text-white bg-[#5c7e10] hover:bg-[#6b9313] px-3 py-1 rounded-sm transition-colors shrink-0">
+          <Button
+            variant="ghost"
+            className="text-[11px] font-semibold text-white bg-[#5c7e10] hover:bg-[#6b9313] px-3 py-1 rounded-sm transition-colors shrink-0"
+          >
             Open in Desktop App
-          </button>
+          </Button>
           <p className="text-steam-text text-[12px]">
             <span className="font-semibold text-white">You&apos;re not signed in!</span>
             {' '}Open this page in the Steam App to wishlist, follow, purchase and see recommendations.

@@ -9,11 +9,10 @@ import { useFeaturedGames } from '@/hooks/useGames'
 import { Skeleton } from '@/components/ui/skeleton'
 import { GameCard } from '@steam-clone/ui'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
+import { formatPrice } from '@/lib/utils'
+import { PriceDisplay } from '@/components/shared/PriceDisplay'
 import type { CartItem } from '@steam-clone/types'
-
-function formatPrice(cents: number) {
-  return `$${(cents / 100).toFixed(2)}`
-}
 
 function CartRow({ item }: { item: CartItem }) {
   const remove = useSetAtom(removeFromCartAtom)
@@ -37,31 +36,18 @@ function CartRow({ item }: { item: CartItem }) {
           {game.title}
         </Link>
         <p className="text-steam-textMuted text-[12px] mt-0.5">{game.developer}</p>
-        <button
+        <Button
+          variant="ghost"
           onClick={() => remove(game.id)}
-          className="mt-1.5 flex items-center gap-1 text-steam-link hover:text-steam-linkHover text-[12px] transition-colors"
+          className="mt-1.5 flex items-center gap-1 text-steam-link hover:text-steam-linkHover text-[12px] transition-colors h-auto p-0"
         >
           <X size={11} />
           Remove
-        </button>
+        </Button>
       </div>
 
       <div className="shrink-0 text-right">
-        {game.price.isFree ? (
-          <span className="text-steam-accentPale text-[14px] font-medium">Free</span>
-        ) : game.price.discountPercent > 0 ? (
-          <div>
-            <div className="flex items-center gap-1.5 justify-end mb-0.5">
-              <span className="bg-steam-discountBg text-steam-discountText text-[11px] font-bold px-1.5 py-0.5 rounded-sm leading-none">
-                -{game.price.discountPercent}%
-              </span>
-              <span className="text-steam-textDim text-[12px] line-through">{formatPrice(game.price.initial)}</span>
-            </div>
-            <span className="text-steam-salePrice text-[16px] font-bold">{formatPrice(game.price.final)}</span>
-          </div>
-        ) : (
-          <span className="text-steam-text text-[15px] font-medium">{formatPrice(game.price.final)}</span>
-        )}
+        <PriceDisplay price={game.price} size="sm" />
       </div>
     </div>
   )
@@ -96,13 +82,14 @@ function OrderSummary() {
         </div>
       )}
 
-      <button
+      <Button
+        variant="ghost"
         disabled={isEmpty}
         className="w-full py-2 text-[13px] font-semibold text-white rounded-sm transition-colors
           bg-[#5c7e10] hover:bg-[#6b9313] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#5c7e10]"
       >
         Continue to payment
-      </button>
+      </Button>
 
       {!isEmpty && (
         <p className="text-steam-textDim text-[11px] mt-3 leading-relaxed">
@@ -134,24 +121,26 @@ export default function CartPage() {
             <div className="py-4">
               <p className="text-steam-textMuted text-[14px] mb-4">Your cart is empty.</p>
               <div className="flex gap-2">
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => router.push('/')}
                   className="text-[13px] font-semibold text-white bg-[#4a7a9b] hover:bg-[#5a8aab] px-4 py-2 rounded-sm transition-colors"
                 >
                   Continue Shopping
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
             <div>
               {items.map(item => <CartRow key={item.gameId} item={item} />)}
               <div className="flex justify-end pt-4">
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => router.push('/')}
-                  className="text-[12px] text-steam-link hover:text-steam-linkHover transition-colors"
+                  className="text-[12px] text-steam-link hover:text-steam-linkHover transition-colors h-auto p-0"
                 >
                   ← Continue Shopping
-                </button>
+                </Button>
               </div>
             </div>
           )}

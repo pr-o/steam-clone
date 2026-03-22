@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useAtomValue } from 'jotai'
 import { isSignedInAtom } from '@/stores/userStore'
+import { Button } from '@/components/ui/button'
 
 export function DiscoveryQueueBanner() {
   const isSignedIn = useAtomValue(isSignedInAtom)
@@ -19,16 +20,18 @@ export function DiscoveryQueueBanner() {
             : 'Sign in to discover top-selling, new and recommended titles.'}
         </p>
         {isSignedIn ? (
-          <button className="text-[13px] font-semibold text-white px-4 py-1.5 rounded-sm bg-steam-blue hover:bg-steam-cerulean transition-colors">
-            Explore Queue
-          </button>
-        ) : (
-          <Link
-            href="/login"
-            className="inline-block text-[13px] font-semibold text-white px-4 py-1.5 rounded-sm bg-steam-blue hover:bg-steam-cerulean transition-colors"
+          <Button
+            variant="ghost"
+            className="text-[13px] font-semibold text-white px-4 py-1.5 rounded-sm bg-steam-blue hover:bg-steam-cerulean transition-colors h-auto"
           >
-            Sign in
-          </Link>
+            Explore Queue
+          </Button>
+        ) : (
+          <Button variant="ghost" asChild className="text-[13px] font-semibold text-white px-4 py-1.5 rounded-sm bg-steam-blue hover:bg-steam-cerulean transition-colors h-auto">
+            <Link href="/login">
+              Sign in
+            </Link>
+          </Button>
         )}
       </div>
     </section>

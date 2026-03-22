@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 const FOOTER_COLUMNS = [
   {
@@ -64,12 +65,13 @@ export function Footer() {
           {/* Social icons placeholder */}
           <div className="flex items-center gap-3 pt-1">
             {['𝕏', 'f', 'in', 'YT'].map(icon => (
-              <button
+              <Button
                 key={icon}
-                className="w-7 h-7 rounded flex items-center justify-center text-[11px] font-bold text-steam-textMuted hover:text-white bg-[#2a3f5a] hover:bg-steam-sidebar transition-colors"
+                variant="ghost"
+                className="w-7 h-7 rounded flex items-center justify-center text-[11px] font-bold text-steam-textMuted hover:text-white bg-[#2a3f5a] hover:bg-steam-sidebar transition-colors p-0"
               >
                 {icon}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

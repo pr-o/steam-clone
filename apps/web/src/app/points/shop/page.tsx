@@ -4,6 +4,7 @@ import { atom, useAtom, useAtomValue } from 'jotai'
 import { cn } from '@/lib/utils'
 import { currentUserAtom } from '@/stores/userStore'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
 
 // ─── Types & Data ─────────────────────────────────────────────────────────────
 
@@ -169,15 +170,13 @@ export default function PointsShopPage() {
                     </p>
                   )
                 }
-                const isActive = activeCategory === item.category && (
-                  !item.indent || NAV.find(n => n.category === activeCategory && !n.indent)?.label === item.label
-                )
                 return (
-                  <button
+                  <Button
                     key={i}
+                    variant="ghost"
                     onClick={() => setActiveCategory(item.category)}
                     className={cn(
-                      'w-full text-left rounded-sm transition-colors text-[13px]',
+                      'w-full text-left rounded-sm transition-colors text-[13px] justify-start',
                       item.indent ? 'px-6 py-1.5' : 'px-3 py-2',
                       activeCategory === item.category
                         ? 'text-white bg-[#1b2838]'
@@ -185,7 +184,7 @@ export default function PointsShopPage() {
                     )}
                   >
                     {item.label}
-                  </button>
+                  </Button>
                 )
               })}
             </nav>

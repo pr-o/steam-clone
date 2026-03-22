@@ -6,7 +6,13 @@ import { ChevronRight } from 'lucide-react'
 import { useAllGames } from '@/hooks/useGames'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { cn, formatPrice } from '@/lib/utils'
+import { RatingBadge } from '@/components/shared/RatingBadge'
+import { PriceDisplay } from '@/components/shared/PriceDisplay'
 import type { Game } from '@steam-clone/types'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -31,22 +37,6 @@ const PRICE_FILTERS = [
   { value: '75', label: '75% Off or More' },
 ]
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-const RATING_COLOR: Record<string, string> = {
-  'Overwhelmingly Positive': '#66c0f4',
-  'Very Positive': '#66c0f4',
-  'Mostly Positive': '#66c0f4',
-  Mixed: '#b9a074',
-  'Mostly Negative': '#c34741',
-  'Very Negative': '#c34741',
-  'Overwhelmingly Negative': '#c34741',
-}
-
-function formatPrice(cents: number) {
-  return `$${(cents / 100).toFixed(2)}`
-}
-
 // ─── Event Card ───────────────────────────────────────────────────────────────
 
 function EventCard({ event }: { event: typeof MOCK_EVENTS[0] }) {
@@ -68,7 +58,6 @@ function EventCard({ event }: { event: typeof MOCK_EVENTS[0] }) {
 // ─── Game Row ─────────────────────────────────────────────────────────────────
 
 function DiscountRow({ game }: { game: Game }) {
-  const rc = RATING_COLOR[game.rating.summary] ?? '#66c0f4'
   return (
     <Link
       href={`/app/${game.id}/${game.slug}`}
@@ -107,18 +96,18 @@ function DiscountRow({ game }: { game: Game }) {
         </div>
 
         <div className="flex items-center gap-2 mt-1">
-          <span className="text-[12px]" style={{ color: rc }}>{game.rating.summary}</span>
-          <span className="text-steam-textDim text-[11px]">({game.rating.totalReviews.toLocaleString()} reviews)</span>
+          <RatingBadge
+            summary={game.rating.summary}
+            score={game.rating.totalReviews}
+            showScore
+            className="text-[12px]"
+          />
         </div>
       </div>
 
       {/* Discount price */}
       <div className="shrink-0 flex flex-col items-end justify-end w-[110px] gap-1">
-        <span className="bg-steam-discountBg text-steam-discountText text-[14px] font-bold px-2.5 py-1 rounded-sm">
-          -{game.price.discountPercent}%
-        </span>
-        <span className="text-steam-textDim text-[12px] line-through">{formatPrice(game.price.initial)}</span>
-        <span className="text-steam-salePrice text-[16px] font-bold">{formatPrice(game.price.final)}</span>
+        <PriceDisplay price={game.price} size="md" />
       </div>
     </Link>
   )
@@ -139,32 +128,39 @@ function FilterSidebar({
         <p className="text-steam-text text-[12px] font-semibold mb-1 flex items-center justify-between cursor-pointer hover:text-white transition-colors">
           Price <ChevronRight size={12} />
         </p>
-        <div className="flex flex-col gap-1 pl-1 mb-4">
+
+        <RadioGroup
+          value={minDiscount}
+          onValueChange={setMinDiscount}
+          className="flex flex-col gap-1 pl-1 mb-4"
+        >
           {PRICE_FILTERS.map(f => (
-            <label key={f.value} className="flex items-center gap-2 cursor-pointer group/opt">
-              <input
-                type="radio"
-                name="discount"
-                checked={minDiscount === f.value}
-                onChange={() => setMinDiscount(f.value)}
+            <div key={f.value} className="flex items-center gap-2 cursor-pointer group/opt">
+              <RadioGroupItem
+                value={f.value}
+                id={`discount-${f.value}`}
                 className="accent-steam-blue"
               />
-              <span className={cn(
-                'text-[11px] transition-colors',
-                minDiscount === f.value ? 'text-steam-text' : 'text-steam-textMuted group-hover/opt:text-steam-text'
-              )}>
+              <Label
+                htmlFor={`discount-${f.value}`}
+                className={cn(
+                  'text-[11px] transition-colors cursor-pointer',
+                  minDiscount === f.value ? 'text-steam-text' : 'text-steam-textMuted group-hover/opt:text-steam-text'
+                )}
+              >
                 {f.label}
-              </span>
-            </label>
+              </Label>
+            </div>
           ))}
-        </div>
+        </RadioGroup>
 
-        <button
+        <Button
+          variant="ghost"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="text-steam-link hover:text-steam-linkHover text-[11px] transition-colors text-left"
+          className="text-steam-link hover:text-steam-linkHover text-[11px] transition-colors text-left h-auto p-0 justify-start"
         >
           Return to top
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -216,69 +212,79 @@ export default function SpecialsPage() {
 
       {/* Genre tab strip */}
       <div className="bg-[#2a3f2a] border-b border-[#4c6b4c]">
-        <ScrollArea className="max-w-[940px] mx-auto">
-          <div className="flex items-center px-4 sm:px-0">
-            {GENRE_TABS.map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  'px-4 py-2.5 text-[12px] uppercase tracking-wider whitespace-nowrap shrink-0 transition-colors relative',
-                  activeTab === tab
-                    ? 'text-white border-b-2 border-white'
-                    : 'text-[#8fbc8f] hover:text-white'
-                )}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </div>
+        <Tabs
+          value={activeTab}
+          onValueChange={v => setActiveTab(v as GenreTab)}
+          className="max-w-[940px] mx-auto"
+        >
+          <ScrollArea>
+            <TabsList className="flex items-center px-4 sm:px-0 bg-transparent h-auto rounded-none p-0">
+              {GENRE_TABS.map(tab => (
+                <TabsTrigger
+                  key={tab}
+                  value={tab}
+                  className={cn(
+                    'px-4 py-2.5 text-[12px] uppercase tracking-wider whitespace-nowrap shrink-0 transition-colors relative rounded-none bg-transparent',
+                    'data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-white',
+                    'data-[state=inactive]:text-[#8fbc8f] hover:text-white',
+                    'data-[state=active]:shadow-none'
+                  )}
+                >
+                  {tab}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
-      <div className="max-w-[940px] mx-auto px-4 sm:px-0 py-6">
-        {/* Special Events grid */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-steam-navActive text-[13px] font-normal uppercase tracking-[0.12em]">
-              Special Events
-            </h2>
-            <Link href="#" className="text-[12px] text-steam-link hover:text-steam-linkHover transition-colors">
-              View All Events
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {MOCK_EVENTS.map((event, i) => (
-              <EventCard key={i} event={event} />
-            ))}
-          </div>
-        </div>
+          <div className="max-w-[940px] mx-auto px-4 sm:px-0 py-6">
+            {/* Special Events grid */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-steam-navActive text-[13px] font-normal uppercase tracking-[0.12em]">
+                  Special Events
+                </h2>
+                <Link href="#" className="text-[12px] text-steam-link hover:text-steam-linkHover transition-colors">
+                  View All Events
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {MOCK_EVENTS.map((event, i) => (
+                  <EventCard key={i} event={event} />
+                ))}
+              </div>
+            </div>
 
-        {/* Discounts section */}
-        <div className="flex gap-6 items-start">
-          {/* Filter sidebar */}
-          <FilterSidebar minDiscount={minDiscount} setMinDiscount={setMinDiscount} />
+            {/* Discounts section */}
+            <div className="flex gap-6 items-start">
+              {/* Filter sidebar */}
+              <FilterSidebar minDiscount={minDiscount} setMinDiscount={setMinDiscount} />
 
-          {/* Game list */}
-          <div className="flex-1 min-w-0">
-            <p className="text-steam-textMuted text-[12px] mb-3">
-              {isLoading ? 'Loading…' : `${discounted.length} discounted titles`}
-            </p>
-            {isLoading
-              ? Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-[144px] bg-steam-card rounded-sm mb-1" />
-                ))
-              : discounted.length === 0
-              ? (
-                <p className="text-steam-textMuted text-[14px] py-8 text-center">
-                  No games match the selected discount level.
-                </p>
-              )
-              : discounted.map(game => <DiscountRow key={game.id} game={game} />)
-            }
+              {/* Game list */}
+              <div className="flex-1 min-w-0">
+                {GENRE_TABS.map(tab => (
+                  <TabsContent key={tab} value={tab} className="mt-0">
+                    <p className="text-steam-textMuted text-[12px] mb-3">
+                      {isLoading ? 'Loading…' : `${discounted.length} discounted titles`}
+                    </p>
+                    {isLoading
+                      ? Array.from({ length: 5 }).map((_, i) => (
+                          <Skeleton key={i} className="h-[144px] bg-steam-card rounded-sm mb-1" />
+                        ))
+                      : discounted.length === 0
+                      ? (
+                        <p className="text-steam-textMuted text-[14px] py-8 text-center">
+                          No games match the selected discount level.
+                        </p>
+                      )
+                      : discounted.map(game => <DiscountRow key={game.id} game={game} />)
+                    }
+                  </TabsContent>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        </Tabs>
       </div>
     </div>
   )

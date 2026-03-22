@@ -3,11 +3,17 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Monitor, Apple, X as LinuxIcon, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react'
+import { SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react'
 import { useAllGames, useSearchGames } from '@/hooks/useGames'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import { RatingBadge } from '@/components/shared/RatingBadge'
+import { PriceDisplay } from '@/components/shared/PriceDisplay'
+import { PlatformIcons } from '@/components/shared/PlatformIcons'
 import type { Game } from '@steam-clone/types'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -16,27 +22,6 @@ type SortKey = 'relevance' | 'name' | 'release' | 'price_asc' | 'price_desc'
 type PriceFilter = 'any' | 'free' | 'under5' | 'under10' | 'under20' | 'sale'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-const RATING_COLOR: Record<string, string> = {
-  'Overwhelmingly Positive': '#66c0f4',
-  'Very Positive': '#66c0f4',
-  'Mostly Positive': '#66c0f4',
-  Mixed: '#b9a074',
-  'Mostly Negative': '#c34741',
-  'Very Negative': '#c34741',
-  'Overwhelmingly Negative': '#c34741',
-}
-
-function reviewShort(summary: string) {
-  if (summary === 'Overwhelmingly Positive') return 'Overwhelmingly\u00a0Positive'
-  if (summary === 'Very Positive') return 'Very\u00a0Positive'
-  if (summary === 'Mostly Positive') return 'Mostly\u00a0Positive'
-  return summary
-}
-
-function formatPrice(cents: number) {
-  return `$${(cents / 100).toFixed(2)}`
-}
 
 function applyFilters(
   games: Game[],
@@ -76,8 +61,6 @@ function applyFilters(
 // ─── Result Row ───────────────────────────────────────────────────────────────
 
 function ResultRow({ game }: { game: Game }) {
-  const rc = RATING_COLOR[game.rating.summary] ?? '#66c0f4'
-
   return (
     <Link
       href={`/app/${game.id}/${game.slug}`}
@@ -97,16 +80,8 @@ function ResultRow({ game }: { game: Game }) {
         <div className="flex-1 min-w-0">
           <p className="text-steam-text text-[14px] font-medium leading-tight truncate">{game.title}</p>
           <div className="flex items-center gap-2 mt-1">
-            {/* Platform icons */}
-            <div className="flex items-center gap-1">
-              {game.platforms.windows && <Monitor size={11} className="text-steam-textMuted" />}
-              {game.platforms.mac && <Apple size={11} className="text-steam-textMuted" />}
-              {game.platforms.linux && <LinuxIcon size={11} className="text-steam-textMuted" />}
-            </div>
-            {/* Review badge */}
-            <span className="text-[11px] font-medium" style={{ color: rc }}>
-              {reviewShort(game.rating.summary)}
-            </span>
+            <PlatformIcons platforms={game.platforms} size={11} className="text-steam-textMuted" />
+            <RatingBadge summary={game.rating.summary} className="text-[11px]" />
           </div>
         </div>
 
@@ -118,21 +93,7 @@ function ResultRow({ game }: { game: Game }) {
 
       {/* Price */}
       <div className="shrink-0 flex items-center justify-end pr-3 w-[120px]">
-        {game.price.isFree ? (
-          <span className="text-steam-accentPale text-[13px] font-medium">Free</span>
-        ) : game.price.discountPercent > 0 ? (
-          <div className="flex items-center gap-1.5">
-            <span className="bg-steam-discountBg text-steam-discountText text-[11px] font-bold px-1.5 py-0.5 rounded-sm leading-none">
-              -{game.price.discountPercent}%
-            </span>
-            <div className="flex flex-col leading-none text-right">
-              <span className="text-steam-textDim text-[10px] line-through">{formatPrice(game.price.initial)}</span>
-              <span className="text-steam-salePrice text-[12px] font-bold">{formatPrice(game.price.final)}</span>
-            </div>
-          </div>
-        ) : (
-          <span className="text-steam-text text-[13px]">{formatPrice(game.price.final)}</span>
-        )}
+        <PriceDisplay price={game.price} size="sm" />
       </div>
     </Link>
   )
@@ -144,13 +105,14 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
   const [open, setOpen] = useState(true)
   return (
     <div className="border-b border-steam-borderSubtle">
-      <button
+      <Button
+        variant="ghost"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between py-2 text-[12px] font-semibold text-steam-text hover:text-white transition-colors"
       >
         {title}
         {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-      </button>
+      </Button>
       {open && <div className="pb-3">{children}</div>}
     </div>
   )
@@ -191,22 +153,27 @@ function FilterSidebar({
   return (
     <div className="flex flex-col">
       <FilterSection title="Narrow by Price">
-        <div className="flex flex-col gap-1">
+        <RadioGroup
+          value={price}
+          onValueChange={(val) => setPrice(val as PriceFilter)}
+          className="flex flex-col gap-1"
+        >
           {PRICE_OPTIONS.map(opt => (
-            <label key={opt.value} className="flex items-center gap-2 cursor-pointer group/opt">
-              <input
-                type="radio"
-                name="price"
-                checked={price === opt.value}
-                onChange={() => setPrice(opt.value)}
+            <div key={opt.value} className="flex items-center gap-2 cursor-pointer group/opt">
+              <RadioGroupItem
+                value={opt.value}
+                id={`price-${opt.value}`}
                 className="accent-steam-blue"
               />
-              <span className={cn('text-[12px] transition-colors', price === opt.value ? 'text-steam-text' : 'text-steam-textMuted group-hover/opt:text-steam-text')}>
+              <Label
+                htmlFor={`price-${opt.value}`}
+                className={cn('text-[12px] transition-colors cursor-pointer', price === opt.value ? 'text-steam-text' : 'text-steam-textMuted group-hover/opt:text-steam-text')}
+              >
                 {opt.label}
-              </span>
-            </label>
+              </Label>
+            </div>
           ))}
-        </div>
+        </RadioGroup>
       </FilterSection>
 
       <FilterSection title="Narrow by Tag">
@@ -283,13 +250,14 @@ export function SearchPageClient() {
         </p>
         <div className="flex items-center gap-3">
           {/* Mobile filter toggle */}
-          <button
+          <Button
+            variant="ghost"
             onClick={() => setShowFilters(s => !s)}
             className="md:hidden flex items-center gap-1.5 text-[12px] text-steam-textMuted hover:text-steam-text transition-colors"
           >
             <SlidersHorizontal size={13} />
             Filters
-          </button>
+          </Button>
           {/* Sort */}
           <div className="flex items-center gap-1.5 text-[12px]">
             <span className="text-steam-textMuted">Sort by:</span>
@@ -324,12 +292,13 @@ export function SearchPageClient() {
                 className="mx-auto mb-4 rounded-sm opacity-50"
               />
               <p className="text-steam-textMuted text-[14px]">No results match your filters.</p>
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => { setPrice('any'); setTags([]); setOs([]) }}
                 className="mt-3 text-steam-link hover:text-steam-linkHover text-[12px] transition-colors"
               >
                 Clear filters
-              </button>
+              </Button>
             </div>
           ) : (
             filtered.map(game => <ResultRow key={game.id} game={game} />)

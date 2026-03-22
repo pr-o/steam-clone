@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useAtom } from 'jotai'
 import { Menu } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Button } from '@/components/ui/button'
 import { mobileNavOpenAtom } from '@/stores/uiStore'
 import { isSignedInAtom } from '@/stores/userStore'
 import { cn } from '@/lib/utils'
@@ -87,21 +88,25 @@ export function TopNav() {
             </Link>
           )}
 
-          <button className="text-[11px] text-steam-textMuted hover:text-steam-text transition-colors cursor-pointer">
+          <Button
+            variant="ghost"
+            className="text-[11px] text-steam-textMuted hover:text-steam-text transition-colors cursor-pointer h-auto p-0"
+          >
             Language ▾
-          </button>
+          </Button>
         </div>
 
         {/* Mobile hamburger */}
         <div className="md:hidden ml-auto">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <button
-                className="p-1.5 text-steam-navDefault hover:text-white transition-colors"
+              <Button
+                variant="ghost"
+                className="p-1.5 text-steam-navDefault hover:text-white transition-colors h-auto"
                 aria-label="Open menu"
               >
                 <Menu size={18} />
-              </button>
+              </Button>
             </SheetTrigger>
             <SheetContent
               side="left"

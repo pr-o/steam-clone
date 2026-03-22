@@ -7,6 +7,8 @@ import { searchQueryAtom } from '@/stores/uiStore'
 import { isSignedInAtom } from '@/stores/userStore'
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area'
 import { ScrollBar } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 const BROWSE_ITEMS = [
@@ -37,19 +39,23 @@ export function SubNav() {
         <ScrollAreaPrimitive.Viewport className="w-full h-9">
           <div className="flex items-center h-9">
             {BROWSE_ITEMS.map(({ label, hasDropdown }) => (
-              <button
+              <Button
                 key={label}
+                variant="ghost"
                 className="h-9 px-3 flex items-center gap-1 text-[12px] text-steam-navDefault hover:text-white transition-colors whitespace-nowrap shrink-0"
               >
                 {label}
                 {hasDropdown && <ChevronDown size={11} className="opacity-70" />}
-              </button>
+              </Button>
             ))}
 
             {isSignedIn && (
-              <button className="h-9 px-3 flex items-center gap-1 text-[12px] text-steam-navDefault hover:text-white transition-colors whitespace-nowrap shrink-0">
+              <Button
+                variant="ghost"
+                className="h-9 px-3 flex items-center gap-1 text-[12px] text-steam-navDefault hover:text-white transition-colors whitespace-nowrap shrink-0"
+              >
                 Your Store
-              </button>
+              </Button>
             )}
           </div>
         </ScrollAreaPrimitive.Viewport>
@@ -63,7 +69,7 @@ export function SubNav() {
         className="flex items-center shrink-0 pr-3"
       >
         <div className="flex items-center bg-[#316282] rounded-sm overflow-hidden">
-          <input
+          <Input
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
@@ -71,15 +77,16 @@ export function SubNav() {
             className={cn(
               'h-[26px] w-[180px] sm:w-[220px] px-2 text-[12px] bg-transparent',
               'text-steam-text placeholder:text-steam-textDim',
-              'outline-none focus:ring-0 border-0'
+              'outline-none focus:ring-0 border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
             )}
           />
-          <button
+          <Button
             type="submit"
-            className="h-[26px] w-[30px] flex items-center justify-center bg-steam-blue hover:bg-steam-cerulean transition-colors shrink-0"
+            variant="ghost"
+            className="h-[26px] w-[30px] flex items-center justify-center bg-steam-blue hover:bg-steam-cerulean transition-colors shrink-0 p-0 rounded-none"
           >
             <Search size={13} className="text-white" />
-          </button>
+          </Button>
         </div>
       </form>
     </div>

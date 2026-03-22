@@ -4,46 +4,10 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useFeaturedGames } from '@/hooks/useGames'
 import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { cn, getRatingColor } from '@/lib/utils'
+import { PriceDisplay } from '@/components/shared/PriceDisplay'
 import type { Game } from '@steam-clone/types'
-
-const RATING_COLOR: Record<string, string> = {
-  'Overwhelmingly Positive': '#66c0f4',
-  'Very Positive': '#66c0f4',
-  'Mostly Positive': '#66c0f4',
-  'Mixed': '#b9a074',
-  'Mostly Negative': '#c34741',
-  'Very Negative': '#c34741',
-  'Overwhelmingly Negative': '#c34741',
-}
-
-function PriceBlock({ game }: { game: Game }) {
-  if (game.price.isFree) {
-    return <span className="text-steam-accentPale font-bold text-[15px]">Free to Play</span>
-  }
-  if (game.price.discountPercent > 0) {
-    return (
-      <div className="flex items-center gap-2">
-        <span className="bg-steam-discountBg text-steam-discountText text-[13px] font-bold px-2 py-1 rounded-sm">
-          -{game.price.discountPercent}%
-        </span>
-        <div className="flex flex-col leading-none">
-          <span className="text-steam-textDim text-[11px] line-through">
-            ${(game.price.initial / 100).toFixed(2)}
-          </span>
-          <span className="text-steam-salePrice font-bold text-[15px]">
-            ${(game.price.final / 100).toFixed(2)}
-          </span>
-        </div>
-      </div>
-    )
-  }
-  return (
-    <span className="text-steam-salePrice font-bold text-[15px]">
-      ${(game.price.final / 100).toFixed(2)}
-    </span>
-  )
-}
 
 export function HeroCarousel() {
   const { data: games, isLoading } = useFeaturedGames()
@@ -74,7 +38,7 @@ export function HeroCarousel() {
 
   const featured = games.slice(0, 5)
   const active = featured[activeIndex]
-  const ratingColor = RATING_COLOR[active.rating.summary] ?? '#66c0f4'
+  const ratingColor = getRatingColor(active.rating.summary)
 
   return (
     <div className="w-full bg-steam-panel select-none">
@@ -120,7 +84,7 @@ export function HeroCarousel() {
               </p>
             </div>
             <div className="pointer-events-auto">
-              <PriceBlock game={active} />
+              <PriceDisplay price={active.price} size="md" />
             </div>
           </div>
 
@@ -136,11 +100,12 @@ export function HeroCarousel() {
         {/* Thumbnail strip */}
         <div className="flex border-t-2 border-[#0e1825]">
           {featured.map((game, i) => (
-            <button
+            <Button
               key={game.id}
+              variant="ghost"
               onClick={() => setActiveIndex(i)}
               className={cn(
-                'flex-1 relative overflow-hidden transition-opacity focus-visible:outline-none',
+                'flex-1 relative overflow-hidden transition-opacity focus-visible:outline-none p-0 rounded-none h-auto',
                 activeIndex === i ? 'opacity-100' : 'opacity-50 hover:opacity-75'
               )}
             >
@@ -152,7 +117,7 @@ export function HeroCarousel() {
               {activeIndex === i && (
                 <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-steam-blue" />
               )}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

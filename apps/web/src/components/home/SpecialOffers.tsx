@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useAllGames } from '@/hooks/useGames'
 import { Skeleton } from '@/components/ui/skeleton'
+import { PriceDisplay } from '@/components/shared/PriceDisplay'
 
 export function SpecialOffers() {
   const { data: games, isLoading } = useAllGames()
@@ -46,16 +47,8 @@ export function SpecialOffers() {
                   <p className="text-steam-text text-[13px] font-medium truncate leading-tight">
                     {game.title}
                   </p>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <span className="bg-steam-discountBg text-steam-discountText text-[11px] font-bold px-1.5 py-0.5 rounded-sm leading-none shrink-0">
-                      -{game.price.discountPercent}%
-                    </span>
-                    <span className="text-steam-origPrice text-[11px] line-through">
-                      ${(game.price.initial / 100).toFixed(2)}
-                    </span>
-                    <span className="text-steam-salePrice text-[12px] font-bold">
-                      ${(game.price.final / 100).toFixed(2)}
-                    </span>
+                  <div className="mt-1">
+                    <PriceDisplay price={game.price} size="sm" />
                   </div>
                 </div>
               </Link>

@@ -4,38 +4,18 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useAllGames } from '@/hooks/useGames'
 import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { cn, formatDate } from '@/lib/utils'
+import { RatingBadge } from '@/components/shared/RatingBadge'
+import { PriceDisplay } from '@/components/shared/PriceDisplay'
 import type { Game } from '@steam-clone/types'
 
 const TABS = ['New Releases', 'Coming Soon', 'Recently Updated'] as const
 type Tab = (typeof TABS)[number]
 
-const RATING_COLOR: Record<string, string> = {
-  'Overwhelmingly Positive': '#66c0f4',
-  'Very Positive': '#66c0f4',
-  'Mostly Positive': '#66c0f4',
-  Mixed: '#b9a074',
-  'Mostly Negative': '#c34741',
-  'Very Negative': '#c34741',
-  'Overwhelmingly Negative': '#c34741',
-}
-
-function formatPrice(cents: number) {
-  if (cents === 0) return 'Free'
-  if (cents < 0) return 'Free to Play'
-  return `$${(cents / 100).toFixed(2)}`
-}
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
-
 // ─── Game Row ────────────────────────────────────────────────────────────────
 
 function GameRow({ game }: { game: Game }) {
-  const hasDiscount = game.price.discountPercent > 0
-  const ratingColor = RATING_COLOR[game.rating.summary] ?? '#8f98a0'
-
   return (
     <Link
       href={`/app/${game.id}/${game.slug}`}
@@ -61,26 +41,14 @@ function GameRow({ game }: { game: Game }) {
         </div>
 
         <div className="flex items-center gap-3 mt-2 text-[11px]">
-          <span style={{ color: ratingColor }}>{game.rating.summary}</span>
+          <RatingBadge summary={game.rating.summary} />
           <span className="text-[#4e5d6e]">·</span>
           <span className="text-[#8f98a0]">{formatDate(game.releaseDate)}</span>
         </div>
       </div>
 
       <div className="shrink-0 flex flex-col items-end justify-center gap-1">
-        {hasDiscount && (
-          <span className="bg-[#4c6b22] text-[#a4d007] text-[11px] font-bold px-1.5 py-0.5 rounded-sm">
-            -{game.price.discountPercent}%
-          </span>
-        )}
-        <div className="text-right">
-          {hasDiscount && (
-            <p className="text-[11px] text-[#8f98a0] line-through">{formatPrice(game.price.initial)}</p>
-          )}
-          <p className={cn('text-[13px] font-semibold', hasDiscount ? 'text-[#acdbf5]' : 'text-[#c7d5e0]')}>
-            {formatPrice(game.price.final)}
-          </p>
-        </div>
+        <PriceDisplay price={game.price} size="sm" />
       </div>
     </Link>
   )
@@ -125,35 +93,45 @@ export default function NewReleasesPage() {
     <div className="max-w-[940px] mx-auto px-4 sm:px-0 py-6">
       {/* Header */}
       <div className="mb-5">
-        <h1 className="text-white text-[24px] font-bold tracking-tight">New & Upcoming</h1>
+        <h1 className="text-white text-[24px] font-bold tracking-tight">New &amp; Upcoming</h1>
         <p className="text-[#8f98a0] text-[13px] mt-1">The latest releases and what&apos;s coming soon to Steam</p>
       </div>
 
       {/* Tab Bar */}
-      <div className="flex gap-1 mb-5 border-b border-[#2a3a4a]">
-        {TABS.map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={cn(
-              'px-4 py-2.5 text-[13px] font-medium transition-colors relative',
-              activeTab === tab
-                ? 'text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[#1a9fff]'
-                : 'text-[#8f98a0] hover:text-[#c7d5e0]'
-            )}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        value={activeTab}
+        onValueChange={v => setActiveTab(v as Tab)}
+        className="w-full"
+      >
+        <TabsList className="flex gap-1 mb-5 border-b border-[#2a3a4a] bg-transparent h-auto rounded-none p-0">
+          {TABS.map(tab => (
+            <TabsTrigger
+              key={tab}
+              value={tab}
+              className={cn(
+                'px-4 py-2.5 text-[13px] font-medium transition-colors relative rounded-none bg-transparent',
+                'data-[state=active]:text-white data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0 data-[state=active]:after:h-[2px] data-[state=active]:after:bg-[#1a9fff]',
+                'data-[state=inactive]:text-[#8f98a0] hover:text-[#c7d5e0]',
+                'data-[state=active]:shadow-none'
+              )}
+            >
+              {tab}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      {/* Game List */}
-      <div className="space-y-1.5">
-        {isLoading
-          ? Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
-          : games.map(game => <GameRow key={game.id} game={game} />)
-        }
-      </div>
+        {TABS.map(tab => (
+          <TabsContent key={tab} value={tab} className="mt-0">
+            {/* Game List */}
+            <div className="space-y-1.5">
+              {isLoading
+                ? Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} />)
+                : games.map(game => <GameRow key={game.id} game={game} />)
+              }
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   )
 }

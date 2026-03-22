@@ -7,6 +7,7 @@ import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area'
 import { useAllGames } from '@/hooks/useGames'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollBar } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
 
 export function SteamDeckSection() {
   const { data: games, isLoading } = useAllGames()
@@ -32,13 +33,14 @@ export function SteamDeckSection() {
       </div>
 
       <div className="relative group/deck">
-        <button
+        <Button
+          variant="ghost"
           onClick={() => scroll('left')}
-          className="absolute left-0 top-0 bottom-0 z-10 w-10 flex items-center justify-start pl-1 bg-gradient-to-r from-steam-bg to-transparent opacity-0 group-hover/deck:opacity-100 transition-opacity"
+          className="absolute left-0 top-0 bottom-0 z-10 w-10 flex items-center justify-start pl-1 bg-gradient-to-r from-steam-bg to-transparent opacity-0 group-hover/deck:opacity-100 transition-opacity h-auto rounded-none p-0"
           aria-label="Scroll left"
         >
           <ChevronLeft size={22} className="text-white drop-shadow" />
-        </button>
+        </Button>
 
         <ScrollAreaPrimitive.Root className="relative overflow-hidden">
           <ScrollAreaPrimitive.Viewport ref={viewportRef} className="w-full">
@@ -74,13 +76,14 @@ export function SteamDeckSection() {
           <ScrollAreaPrimitive.Corner />
         </ScrollAreaPrimitive.Root>
 
-        <button
+        <Button
+          variant="ghost"
           onClick={() => scroll('right')}
-          className="absolute right-0 top-0 bottom-0 z-10 w-10 flex items-center justify-end pr-1 bg-gradient-to-l from-steam-bg to-transparent opacity-0 group-hover/deck:opacity-100 transition-opacity"
+          className="absolute right-0 top-0 bottom-0 z-10 w-10 flex items-center justify-end pr-1 bg-gradient-to-l from-steam-bg to-transparent opacity-0 group-hover/deck:opacity-100 transition-opacity h-auto rounded-none p-0"
           aria-label="Scroll right"
         >
           <ChevronRight size={22} className="text-white drop-shadow" />
-        </button>
+        </Button>
       </div>
     </section>
   )
