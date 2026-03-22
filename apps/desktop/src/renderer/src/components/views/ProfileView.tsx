@@ -2,6 +2,7 @@ import { useAtomValue } from 'jotai'
 import { currentUserAtom, friendsAtom } from '@renderer/stores/userStore'
 import { installedGamesAtom } from '@renderer/stores/libraryStore'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { Button } from '@renderer/components/ui/button'
 import { cn } from '@renderer/lib/utils'
 
 function StatusDot({ isOnline, inGame }: { isOnline: boolean; inGame?: boolean }) {
@@ -67,9 +68,12 @@ export function ProfileView() {
               ))}
             </div>
 
-            <button className="w-full text-[12px] font-semibold text-white border border-steam-borderSubtle hover:border-steam-text py-2 rounded-sm transition-colors">
+            <Button
+              variant="ghost"
+              className="w-full text-[12px] font-semibold text-white border border-steam-borderSubtle hover:border-steam-text py-2 h-auto rounded-sm transition-colors"
+            >
               Edit Profile
-            </button>
+            </Button>
           </div>
 
           {/* Right: friends list */}
@@ -92,9 +96,12 @@ export function ProfileView() {
                           <span className="text-steam-online text-[11px]">Online</span>
                         </div>
                       </div>
-                      <button className="text-[11px] text-steam-textMuted hover:text-steam-text border border-steam-borderSubtle px-2.5 py-1 rounded-sm transition-colors shrink-0">
+                      <Button
+                        variant="ghost"
+                        className="text-[11px] text-steam-textMuted hover:text-steam-text border border-steam-borderSubtle px-2.5 py-1 h-auto rounded-sm transition-colors shrink-0"
+                      >
                         Message
-                      </button>
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -115,9 +122,12 @@ export function ProfileView() {
                           <span className="text-steam-textDim text-[11px]">Offline</span>
                         </div>
                       </div>
-                      <button className="text-[11px] text-steam-textMuted hover:text-steam-text border border-steam-borderSubtle px-2.5 py-1 rounded-sm transition-colors shrink-0">
+                      <Button
+                        variant="ghost"
+                        className="text-[11px] text-steam-textMuted hover:text-steam-text border border-steam-borderSubtle px-2.5 py-1 h-auto rounded-sm transition-colors shrink-0"
+                      >
                         Message
-                      </button>
+                      </Button>
                     </div>
                   ))}
                 </div>

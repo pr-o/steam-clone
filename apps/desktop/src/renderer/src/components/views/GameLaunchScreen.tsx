@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAtom } from 'jotai'
 import { currentlyPlayingAtom } from '@renderer/stores/libraryStore'
+import { Button } from '@renderer/components/ui/button'
 
 export function GameLaunchScreen() {
   const [game, setGame] = useAtom(currentlyPlayingAtom)
@@ -40,12 +41,13 @@ export function GameLaunchScreen() {
         </p>
         <p className="text-steam-textMuted text-[13px]">Preparing your game</p>
 
-        <button
+        <Button
+          variant="ghost"
           onClick={() => setGame(null)}
-          className="mt-8 text-[12px] text-steam-textMuted hover:text-white border border-steam-borderSubtle hover:border-steam-text px-4 py-1.5 rounded-sm transition-colors"
+          className="mt-8 text-[12px] text-steam-textMuted hover:text-white border border-steam-borderSubtle hover:border-steam-text px-4 py-1.5 h-auto rounded-sm transition-colors"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   )

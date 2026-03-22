@@ -3,6 +3,7 @@ import { Pause, Play, X, Download } from 'lucide-react'
 import { downloadQueueAtom, type DownloadItem } from '@renderer/stores/libraryStore'
 import { Progress } from '@renderer/components/ui/progress'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { Button } from '@renderer/components/ui/button'
 import { cn } from '@renderer/lib/utils'
 
 function DownloadRow({ item, onToggle, onRemove }: { item: DownloadItem; onToggle: () => void; onRemove: () => void }) {
@@ -17,20 +18,22 @@ function DownloadRow({ item, onToggle, onRemove }: { item: DownloadItem; onToggl
           <div className="flex items-start justify-between gap-2">
             <p className="text-steam-text text-[14px] font-semibold leading-tight truncate">{item.game.title}</p>
             <div className="flex items-center gap-1 shrink-0">
-              <button
+              <Button
+                variant="ghost"
                 onClick={onToggle}
-                className="text-steam-textMuted hover:text-white transition-colors p-1"
+                className="text-steam-textMuted hover:text-white transition-colors p-1 h-auto"
                 aria-label={isActive ? 'Pause' : 'Resume'}
               >
                 {isActive ? <Pause size={14} /> : <Play size={14} />}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={onRemove}
-                className="text-steam-textMuted hover:text-[#c34741] transition-colors p-1"
+                className="text-steam-textMuted hover:text-[#c34741] transition-colors p-1 h-auto"
                 aria-label="Remove"
               >
                 <X size={14} />
-              </button>
+              </Button>
             </div>
           </div>
 

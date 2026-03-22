@@ -1,6 +1,7 @@
 import { useAtomValue } from 'jotai'
 import { Minus, Square, X } from 'lucide-react'
 import { titleBarTitleAtom } from '@renderer/stores/uiStore'
+import { Button } from '@renderer/components/ui/button'
 import { cn } from '@renderer/lib/utils'
 
 const isMac = window.electronAPI?.platform === 'darwin'
@@ -33,27 +34,30 @@ export function TitleBar() {
         className={cn('flex items-center w-[200px] justify-end', isMac && 'invisible')}
         style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
       >
-        <button
+        <Button
+          variant="ghost"
           onClick={() => window.electronAPI?.minimize()}
-          className="h-8 w-11 flex items-center justify-center text-steam-textMuted hover:text-white hover:bg-white/10 transition-colors"
+          className="h-8 w-11 flex items-center justify-center text-steam-textMuted hover:text-white hover:bg-white/10 transition-colors rounded-none p-0"
           aria-label="Minimize"
         >
           <Minus size={12} />
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           onClick={() => window.electronAPI?.maximize()}
-          className="h-8 w-11 flex items-center justify-center text-steam-textMuted hover:text-white hover:bg-white/10 transition-colors"
+          className="h-8 w-11 flex items-center justify-center text-steam-textMuted hover:text-white hover:bg-white/10 transition-colors rounded-none p-0"
           aria-label="Maximize"
         >
           <Square size={10} />
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           onClick={() => window.electronAPI?.close()}
-          className="h-8 w-11 flex items-center justify-center text-steam-textMuted hover:text-white hover:bg-red-600 transition-colors"
+          className="h-8 w-11 flex items-center justify-center text-steam-textMuted hover:text-white hover:bg-red-600 transition-colors rounded-none p-0"
           aria-label="Close"
         >
           <X size={12} />
-        </button>
+        </Button>
       </div>
     </div>
   )

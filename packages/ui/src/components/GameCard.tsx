@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Game } from '@steam-clone/types'
+import { PriceDisplay } from './PriceDisplay'
 
 export interface GameCardProps {
   game: Game
@@ -7,8 +8,6 @@ export interface GameCardProps {
 }
 
 export function GameCard({ game, onClick }: GameCardProps) {
-  const discount = game.price.discountPercent
-
   return (
     <div
       role="button"
@@ -26,26 +25,8 @@ export function GameCard({ game, onClick }: GameCardProps) {
       </div>
       <div className="p-3">
         <p className="text-sm text-[#c7d5e0] font-medium truncate">{game.title}</p>
-        <div className="mt-2 flex items-center justify-between">
-          {discount > 0 ? (
-            <div className="flex items-center gap-2">
-              <span className="bg-[#4c6b22] text-[#a4d007] text-xs font-bold px-1.5 py-0.5 rounded">
-                -{discount}%
-              </span>
-              <div className="flex flex-col">
-                <span className="text-[#738895] text-xs line-through">
-                  ${(game.price.initial / 100).toFixed(2)}
-                </span>
-                <span className="text-[#acdbf5] text-sm font-bold">
-                  ${(game.price.final / 100).toFixed(2)}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <span className="text-[#acdbf5] text-sm font-bold">
-              {game.price.isFree ? 'Free to Play' : `$${(game.price.final / 100).toFixed(2)}`}
-            </span>
-          )}
+        <div className="mt-2">
+          <PriceDisplay price={game.price} size="sm" />
         </div>
       </div>
     </div>

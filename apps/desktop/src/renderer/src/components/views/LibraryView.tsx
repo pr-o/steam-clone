@@ -5,6 +5,7 @@ import { installedGamesAtom, currentlyPlayingAtom } from '@renderer/stores/libra
 import { currentUserAtom } from '@renderer/stores/userStore'
 import { Progress } from '@renderer/components/ui/progress'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { Button } from '@renderer/components/ui/button'
 import { cn } from '@renderer/lib/utils'
 import type { Game } from '@steam-clone/types'
 
@@ -31,13 +32,14 @@ function GameDetailPanel({ game }: { game: Game }) {
             <h2 className="text-white text-[22px] font-bold leading-tight">{game.title}</h2>
             <p className="text-steam-textMuted text-[12px] mt-0.5">{formatHours(entry?.playtimeMinutes ?? 0)} on record</p>
           </div>
-          <button
+          <Button
+            variant="ghost"
             onClick={() => setPlaying(game)}
-            className="flex items-center gap-2 bg-[#5c7e10] hover:bg-[#6b9313] text-white font-bold text-[14px] px-6 py-2.5 rounded-sm transition-colors"
+            className="flex items-center gap-2 bg-[#5c7e10] hover:bg-[#6b9313] text-white font-bold text-[14px] px-6 py-2.5 h-auto rounded-sm transition-colors"
           >
             <Play size={16} className="fill-white" />
             PLAY
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -101,9 +103,12 @@ function GameDetailPanel({ game }: { game: Game }) {
           </div>
 
           {/* Community hub */}
-          <button className="w-full text-[12px] text-steam-link hover:text-steam-linkHover border border-steam-borderSubtle hover:border-steam-link py-2 rounded-sm transition-colors">
+          <Button
+            variant="ghost"
+            className="w-full text-[12px] text-steam-link hover:text-steam-linkHover border border-steam-borderSubtle hover:border-steam-link py-2 h-auto rounded-sm transition-colors"
+          >
             View Community Hub
-          </button>
+          </Button>
         </div>
       </ScrollArea>
     </div>
@@ -135,11 +140,12 @@ export function LibraryView() {
         </p>
         <ScrollArea className="flex-1">
           {installedGames.map(game => (
-            <button
+            <Button
               key={game.id}
+              variant="ghost"
               onClick={() => setSelectedGame(game)}
               className={cn(
-                'w-full flex items-center gap-2.5 px-3 py-2 transition-colors text-left',
+                'w-full flex items-center gap-2.5 px-3 py-2 h-auto transition-colors text-left justify-start rounded-none',
                 displayGame?.id === game.id ? 'bg-[#2a4a6e]' : 'hover:bg-[#1b2838]'
               )}
             >
@@ -148,7 +154,7 @@ export function LibraryView() {
                 <p className="text-steam-text text-[12px] font-medium truncate leading-tight">{game.title}</p>
                 <p className="text-steam-textDim text-[10px] mt-0.5">{game.developer}</p>
               </div>
-            </button>
+            </Button>
           ))}
         </ScrollArea>
       </div>

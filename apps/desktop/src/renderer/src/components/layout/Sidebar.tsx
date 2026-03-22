@@ -5,6 +5,8 @@ import { activeTabAtom, activeSidebarGameAtom, type AppTab } from '@renderer/sto
 import { currentUserAtom, friendsAtom } from '@renderer/stores/userStore'
 import { installedGamesAtom } from '@renderer/stores/libraryStore'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
+import { Button } from '@renderer/components/ui/button'
+import { Input } from '@renderer/components/ui/input'
 import { cn } from '@renderer/lib/utils'
 
 const NAV_ITEMS: { tab: AppTab; label: string; icon: React.FC<{ size?: number; className?: string }> }[] = [
@@ -33,11 +35,12 @@ export function Sidebar() {
       {/* Primary nav */}
       <nav className="flex flex-col pt-1">
         {NAV_ITEMS.map(({ tab, label, icon: Icon }) => (
-          <button
+          <Button
             key={tab}
+            variant="ghost"
             onClick={() => setActiveTab(tab)}
             className={cn(
-              'flex items-center gap-3 h-10 px-4 text-[12px] font-semibold tracking-[0.08em] transition-colors relative',
+              'flex items-center gap-3 h-10 px-4 text-[12px] font-semibold tracking-[0.08em] transition-colors relative justify-start rounded-none',
               activeTab === tab
                 ? 'text-white bg-[#1b2838]'
                 : 'text-steam-textMuted hover:text-steam-text hover:bg-white/5'
@@ -48,7 +51,7 @@ export function Sidebar() {
             )}
             <Icon size={15} className={activeTab === tab ? 'text-steam-blue' : ''} />
             {label}
-          </button>
+          </Button>
         ))}
       </nav>
 
@@ -58,12 +61,12 @@ export function Sidebar() {
           <div className="px-3 pb-2">
             <div className="flex items-center gap-2 bg-[#1b2838] rounded px-2 py-1.5">
               <Search size={12} className="text-steam-textMuted shrink-0" />
-              <input
+              <Input
                 type="text"
                 value={librarySearch}
                 onChange={e => setLibrarySearch(e.target.value)}
                 placeholder="Search games..."
-                className="flex-1 text-[11px] bg-transparent text-steam-text placeholder:text-steam-textDim outline-none"
+                className="flex-1 text-[11px] bg-transparent text-steam-text placeholder:text-steam-textDim outline-none border-0 shadow-none h-auto p-0 focus-visible:ring-0"
               />
             </div>
           </div>
@@ -75,10 +78,11 @@ export function Sidebar() {
               </p>
             ) : (
               filteredGames.map(game => (
-                <button
+                <Button
                   key={game.id}
+                  variant="ghost"
                   onClick={() => setActiveSidebarGame(game)}
-                  className="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#1b2838] transition-colors text-left"
+                  className="w-full flex items-center gap-2 px-3 py-2 h-auto hover:bg-[#1b2838] transition-colors text-left justify-start rounded-none"
                 >
                   <img
                     src={game.headerImage}
@@ -91,7 +95,7 @@ export function Sidebar() {
                       {Math.floor((game.playerCount ?? 0) / 60)}h played
                     </p>
                   </div>
-                </button>
+                </Button>
               ))
             )}
           </ScrollArea>
@@ -105,7 +109,11 @@ export function Sidebar() {
       <div className="border-t border-black/40 p-3 flex items-center gap-2">
         {currentUser && (
           <>
-            <button onClick={() => setActiveTab('profile')} className="shrink-0">
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('profile')}
+              className="shrink-0 p-0 h-auto"
+            >
               <img
                 src={currentUser.avatar}
                 alt={currentUser.displayName}
@@ -114,21 +122,22 @@ export function Sidebar() {
                   activeTab === 'profile' ? 'ring-steam-blue' : 'ring-transparent hover:ring-steam-borderSubtle'
                 )}
               />
-            </button>
+            </Button>
             <div className="flex-1 min-w-0">
               <p className="text-[12px] text-white font-medium truncate">{currentUser.displayName}</p>
               <p className="text-[10px] text-steam-online">{onlineFriends} friends online</p>
             </div>
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setActiveTab('settings')}
               className={cn(
-                'transition-colors shrink-0',
+                'transition-colors shrink-0 p-1 h-auto',
                 activeTab === 'settings' ? 'text-steam-blue' : 'text-steam-textMuted hover:text-white'
               )}
               aria-label="Settings"
             >
               <Settings size={14} />
-            </button>
+            </Button>
           </>
         )}
       </div>
