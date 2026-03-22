@@ -33,6 +33,8 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage()
 await page.setViewport({ width: 1440, height: 900 })
 await page.goto(url, { waitUntil: 'networkidle2' })
+// Give MSW service worker time to intercept and respond
+await new Promise(r => setTimeout(r, 2500))
 await page.screenshot({ path: filepath, fullPage: false })
 await browser.close()
 
