@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 
@@ -9,13 +9,28 @@ function createWindow(): void {
     minWidth: 1024,
     minHeight: 600,
     show: false,
+    frame: false,
+    backgroundColor: '#171a21',
     autoHideMenuBar: true,
-    titleBarStyle: 'hidden',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
+      webSecurity: true,
+      contextIsolation: true,
     },
   })
+
+  // Window control IPC handlers
+  ipcMain.handle('window:minimize', () => mainWindow.minimize())
+  ipcMain.handle('window:maximize', () => {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize()
+    } else {
+      mainWindow.maximize()
+    }
+  })
+  ipcMain.handle('window:close', () => mainWindow.close())
+  ipcMain.handle('window:is-maximized', () => mainWindow.isMaximized())
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()

@@ -1,10 +1,16 @@
-import React from 'react'
+import { TitleBar } from '@renderer/components/TitleBar'
+import { Sidebar } from '@renderer/components/layout/Sidebar'
+import { ContentArea } from '@renderer/components/layout/ContentArea'
 
-function App(): React.JSX.Element {
+function App() {
   return (
-    <main>
-      <h1>Steam Desktop</h1>
-    </main>
+    <div className="flex flex-col h-screen bg-steam-bg overflow-hidden">
+      <TitleBar />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+        <ContentArea />
+      </div>
+    </div>
   )
 }
 
