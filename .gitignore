@@ -33,5 +33,8 @@ Thumbs.db
 reference-images/
 temp-screenshots/
 
+# TypeScript build cache
+*.tsbuildinfo
+
 # claude
 .claude
