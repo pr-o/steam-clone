@@ -1,3 +1,74 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Steam dark theme — applied as default (no light mode) */
+    --background: 222 16% 12%;          /* #171a21 */
+    --foreground: 207 26% 83%;          /* #c7d5e0 */
+
+    --card: 213 30% 17%;                /* #1b2838 */
+    --card-foreground: 207 26% 83%;     /* #c7d5e0 */
+
+    --popover: 213 30% 17%;             /* #1b2838 */
+    --popover-foreground: 207 26% 83%; /* #c7d5e0 */
+
+    --primary: 207 100% 56%;            /* #1a9fff */
+    --primary-foreground: 0 0% 100%;    /* #ffffff */
+
+    --secondary: 205 38% 27%;           /* #2a475e */
+    --secondary-foreground: 207 26% 83%; /* #c7d5e0 */
+
+    --muted: 213 30% 17%;               /* #1b2838 */
+    --muted-foreground: 205 8% 60%;     /* #8f98a0 */
+
+    --accent: 207 84% 68%;              /* #66c0f4 */
+    --accent-foreground: 222 16% 12%;   /* #171a21 */
+
+    --destructive: 2 55% 50%;           /* #c34741 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 39% 27%;              /* #2a3f5a */
+    --input: 205 49% 37%;               /* #316282 */
+    --ring: 207 100% 56%;               /* #1a9fff */
+
+    --radius: 0.25rem;
+  }
+
+  /* Force dark theme — Steam has no light mode */
+  .dark {
+    --background: 222 16% 12%;
+    --foreground: 207 26% 83%;
+    --card: 213 30% 17%;
+    --card-foreground: 207 26% 83%;
+    --popover: 213 30% 17%;
+    --popover-foreground: 207 26% 83%;
+    --primary: 207 100% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 205 38% 27%;
+    --secondary-foreground: 207 26% 83%;
+    --muted: 213 30% 17%;
+    --muted-foreground: 205 8% 60%;
+    --accent: 207 84% 68%;
+    --accent-foreground: 222 16% 12%;
+    --destructive: 2 55% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 39% 27%;
+    --input: 205 49% 37%;
+    --ring: 207 100% 56%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-size: 13px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

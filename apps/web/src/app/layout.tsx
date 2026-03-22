@@ -1,5 +1,13 @@
 import type { Metadata } from 'next'
+import { Nunito } from 'next/font/google'
 import './globals.css'
+import { Providers } from '@/components/Providers'
+
+const font = Nunito({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Steam',
@@ -12,8 +20,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className={font.variable}>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }
