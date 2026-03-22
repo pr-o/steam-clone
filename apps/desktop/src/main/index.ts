@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, session } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 
@@ -49,6 +49,18 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  // Allow external images (placehold.co, Steam CDN, etc.)
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; connect-src 'self' ws: wss: https:; font-src 'self' data: https:; media-src 'self' https: blob:",
+        ],
+      },
+    })
+  })
+
   createWindow()
 
   app.on('activate', () => {
