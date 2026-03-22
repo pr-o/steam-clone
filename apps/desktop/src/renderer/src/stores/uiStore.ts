@@ -1,7 +1,7 @@
 import { atom } from 'jotai'
 import type { Game } from '@steam-clone/types'
 
-export type AppTab = 'store' | 'library' | 'community'
+export type AppTab = 'store' | 'library' | 'community' | 'downloads' | 'profile' | 'settings'
 
 export const activeTabAtom = atom<AppTab>('store')
 

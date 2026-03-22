@@ -1,25 +1,25 @@
 import { useAtomValue } from 'jotai'
 import { activeTabAtom } from '@renderer/stores/uiStore'
-import { ScrollArea } from '@renderer/components/ui/scroll-area'
-
-function PlaceholderView({ label }: { label: string }) {
-  return (
-    <div className="flex items-center justify-center h-full">
-      <p className="text-steam-textMuted text-sm">{label} — coming soon</p>
-    </div>
-  )
-}
+import { StoreView } from '@renderer/components/views/StoreView'
+import { LibraryView } from '@renderer/components/views/LibraryView'
+import { CommunityView } from '@renderer/components/views/CommunityView'
+import { DownloadsView } from '@renderer/components/views/DownloadsView'
+import { ProfileView } from '@renderer/components/views/ProfileView'
+import { SettingsView } from '@renderer/components/views/SettingsView'
+import { GameLaunchScreen } from '@renderer/components/views/GameLaunchScreen'
 
 export function ContentArea() {
   const activeTab = useAtomValue(activeTabAtom)
 
   return (
-    <div className="flex-1 min-w-0 h-full overflow-hidden">
-      <ScrollArea className="h-full">
-        {activeTab === 'store' && <PlaceholderView label="Store" />}
-        {activeTab === 'library' && <PlaceholderView label="Library" />}
-        {activeTab === 'community' && <PlaceholderView label="Community" />}
-      </ScrollArea>
+    <div className="flex-1 min-w-0 h-full overflow-hidden relative">
+      {activeTab === 'store' && <StoreView />}
+      {activeTab === 'library' && <LibraryView />}
+      {activeTab === 'community' && <CommunityView />}
+      {activeTab === 'downloads' && <DownloadsView />}
+      {activeTab === 'profile' && <ProfileView />}
+      {activeTab === 'settings' && <SettingsView />}
+      <GameLaunchScreen />
     </div>
   )
 }
