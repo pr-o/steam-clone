@@ -591,8 +591,8 @@ function DropdownPanel({ which }: { which: DropdownKey }) {
       style={{ top: '72px' }} // top-9 (36px nav) + h-9 (36px sub-nav) = 72px
     >
       <div
-        className="w-full border-b border-[#2a3a4a]"
-        style={{ background: '#1b2838' }}
+        className="w-full border-t border-[#0a0d11] border-b border-[#2a3a4a] shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
+        style={{ background: '#0e1319' }}
       >
         <div className="max-w-[960px] mx-auto px-6 py-4">
           {which === 'Browse' && <BrowseDropdown />}
