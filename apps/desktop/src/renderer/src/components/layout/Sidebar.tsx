@@ -8,6 +8,7 @@ import { installedGamesAtom } from '@renderer/stores/libraryStore'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
+import { FriendsActivityPanel } from '@renderer/components/layout/FriendsActivityPanel'
 import { cn } from '@renderer/lib/utils'
 
 const NAV_ITEMS: { tab: AppTab; label: string; icon: React.FC<{ size?: number; className?: string }> }[] = [
@@ -115,8 +116,11 @@ export function Sidebar() {
       )}
       </AnimatePresence>
 
+      {/* Friends + activity (only when library tab inactive — library has its own list) */}
+      {activeTab !== 'library' && <FriendsActivityPanel />}
+
       {/* Spacer */}
-      <div className="flex-1" />
+      {activeTab === 'library' && <div className="flex-1" />}
 
       {/* User section */}
       <div className="border-t border-black/40 p-3 flex items-center gap-2">

@@ -1,4 +1,5 @@
 import type { User } from '@steam-clone/types'
+import { MOCK_GAMES } from './games'
 
 export const MOCK_USER: User = {
   steamId: '76561198000000001',
@@ -31,7 +32,7 @@ export const MOCK_FRIENDS: User[] = [
     countryCode: 'CA',
     memberSince: '2012-07-20',
     isOnline: true,
-    currentGame: undefined,
+    currentGame: MOCK_GAMES.find((g) => g.id === 1),
     library: [],
     wishlist: [],
     cart: [],
@@ -46,6 +47,7 @@ export const MOCK_FRIENDS: User[] = [
     countryCode: 'GB',
     memberSince: '2015-03-08',
     isOnline: true,
+    currentGame: MOCK_GAMES.find((g) => g.id === 6),
     library: [],
     wishlist: [],
     cart: [],
@@ -88,6 +90,7 @@ export const MOCK_FRIENDS: User[] = [
     countryCode: 'FR',
     memberSince: '2009-02-18',
     isOnline: true,
+    currentGame: MOCK_GAMES.find((g) => g.id === 7),
     library: [],
     wishlist: [],
     cart: [],
