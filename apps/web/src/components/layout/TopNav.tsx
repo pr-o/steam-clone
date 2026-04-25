@@ -2,13 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { AnimatePresence, motion } from 'motion/react'
 import { Menu, ShoppingCart } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { mobileNavOpenAtom } from '@/stores/uiStore'
-import { isSignedInAtom } from '@/stores/userStore'
+import { isSignedInAtom, signOutAtom, currentUserAtom } from '@/stores/userStore'
 import { cartCountAtom } from '@/stores/cartStore'
 import { cn } from '@/lib/utils'
 
@@ -29,6 +29,8 @@ export function TopNav() {
   const [mobileOpen, setMobileOpen] = useAtom(mobileNavOpenAtom)
   const [isSignedIn] = useAtom(isSignedInAtom)
   const cartCount = useAtomValue(cartCountAtom)
+  const currentUser = useAtomValue(currentUserAtom)
+  const signOut = useSetAtom(signOutAtom)
   const navLinks = isSignedIn ? [...BASE_LINKS, ...AUTH_LINKS] : BASE_LINKS
 
   return (
@@ -110,12 +112,22 @@ export function TopNav() {
           </Link>
 
           {isSignedIn ? (
-            <Link
-              href="/profile"
-              className="text-[12px] text-steam-link hover:text-steam-linkHover transition-colors"
-            >
-              Account
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/profile"
+                className="text-[12px] text-steam-link hover:text-steam-linkHover transition-colors max-w-[120px] truncate"
+              >
+                {currentUser?.displayName ?? 'Account'}
+              </Link>
+              <span className="text-steam-textDim text-[10px]">|</span>
+              <Button
+                variant="ghost"
+                onClick={() => signOut()}
+                className="text-[11px] text-steam-textMuted hover:text-steam-text transition-colors h-auto p-0"
+              >
+                sign out
+              </Button>
+            </div>
           ) : (
             <Link
               href="/login"

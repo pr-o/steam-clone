@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { useSetAtom } from 'jotai'
+import { LogOut } from 'lucide-react'
+import { signOutAtom } from '@renderer/stores/userStore'
 import { Switch } from '@renderer/components/ui/switch'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { Button } from '@renderer/components/ui/button'
@@ -12,6 +15,20 @@ import {
   SelectItem,
 } from '@renderer/components/ui/select'
 import { cn } from '@renderer/lib/utils'
+
+function SignOutButton() {
+  const signOut = useSetAtom(signOutAtom)
+  return (
+    <Button
+      variant="ghost"
+      onClick={() => signOut()}
+      className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-steam-text bg-[#4a2222] hover:bg-[#6a3030] px-4 py-2 h-auto rounded-sm transition-colors"
+    >
+      <LogOut size={13} />
+      Sign Out
+    </Button>
+  )
+}
 
 function ToggleRow({ label, description, checked, onCheckedChange }: {
   label: string; description?: string; checked: boolean; onCheckedChange: (v: boolean) => void
@@ -125,13 +142,14 @@ export function SettingsView() {
                 className="w-full bg-[#316282] text-steam-text text-[13px] border border-[#1b4d6e] rounded-sm px-3 py-2 outline-none focus:border-steam-blue"
               />
             </div>
-            <div className="py-3">
+            <div className="py-3 flex gap-2">
               <Button
                 variant="ghost"
                 className="text-[12px] font-semibold text-white bg-[#4a7a9b] hover:bg-[#5a8aab] px-4 py-2 h-auto rounded-sm transition-colors"
               >
                 Change Password
               </Button>
+              <SignOutButton />
             </div>
           </TabsContent>
 

@@ -5,10 +5,13 @@ import { useAtomValue } from 'jotai'
 import { motion } from 'motion/react'
 import { Download, Clock } from 'lucide-react'
 import { purchasesAtom } from '@/stores/purchasesStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { formatDate, formatPrice } from '@/lib/utils'
 
 export default function LibraryPage() {
+  const isSignedIn = useRequireAuth()
   const purchases = useAtomValue(purchasesAtom)
+  if (!isSignedIn) return null
   const sorted = [...purchases].sort(
     (a, b) => Date.parse(b.purchasedAt) - Date.parse(a.purchasedAt)
   )

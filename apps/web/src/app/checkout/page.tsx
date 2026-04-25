@@ -8,6 +8,7 @@ import { motion } from 'motion/react'
 import { Lock, ChevronLeft } from 'lucide-react'
 import { cartItemsAtom, cartTotalAtom } from '@/stores/cartStore'
 import { checkoutAtom } from '@/stores/purchasesStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { formatPrice, cn } from '@/lib/utils'
@@ -22,6 +23,7 @@ const PAYMENT_METHODS = [
 type PaymentId = (typeof PAYMENT_METHODS)[number]['id']
 
 export default function CheckoutPage() {
+  const isSignedIn = useRequireAuth()
   const router = useRouter()
   const items = useAtomValue(cartItemsAtom)
   const total = useAtomValue(cartTotalAtom)
@@ -36,6 +38,8 @@ export default function CheckoutPage() {
 
   const isEmpty = items.length === 0
   const { tax, grand } = calcTotalsFromSubtotal(total)
+
+  if (!isSignedIn) return null
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

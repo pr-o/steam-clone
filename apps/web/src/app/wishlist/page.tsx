@@ -9,6 +9,7 @@ import { wishlistAtom, toggleWishlistAtom } from '@/stores/wishlistStore'
 import { cartItemsAtom, addToCartAtom } from '@/stores/cartStore'
 import { ownedGameIdsAtom } from '@/stores/purchasesStore'
 import { useAllGames } from '@/hooks/useGames'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { PriceDisplay } from '@/components/shared/PriceDisplay'
@@ -98,6 +99,7 @@ function WishlistRow({
 }
 
 export default function WishlistPage() {
+  const isSignedIn = useRequireAuth()
   const ids = useAtomValue(wishlistAtom)
   const cartItems = useAtomValue(cartItemsAtom)
   const owned = useAtomValue(ownedGameIdsAtom)
@@ -112,6 +114,8 @@ export default function WishlistPage() {
   }, [allGames, ids])
 
   const cartIds = useMemo(() => new Set(cartItems.map((c) => c.gameId)), [cartItems])
+
+  if (!isSignedIn) return null
 
   return (
     <div className="max-w-[940px] mx-auto px-4 sm:px-0 py-6">

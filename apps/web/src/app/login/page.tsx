@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useSetAtom } from 'jotai'
 import { currentUserAtom } from '@/stores/userStore'
@@ -36,8 +36,10 @@ function BackgroundGrid() {
   )
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next') || '/'
   const setUser = useSetAtom(currentUserAtom)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -50,8 +52,8 @@ export default function LoginPage() {
       setError('Please enter your account name and password.')
       return
     }
-    setUser(MOCK_USER)
-    router.push('/')
+    setUser({ ...MOCK_USER, displayName: username || MOCK_USER.displayName })
+    router.push(next)
   }
 
   const inputCls = cn(
@@ -193,5 +195,13 @@ export default function LoginPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   )
 }
