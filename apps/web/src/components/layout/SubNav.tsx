@@ -164,6 +164,7 @@ function BrowseDropdown() {
 
 interface MockTopSeller {
   id: number
+  slug: string
   title: string
   isFree: boolean
   finalPrice: number
@@ -173,6 +174,7 @@ interface MockTopSeller {
 const MOCK_TOP_SELLERS: MockTopSeller[] = [
   {
     id: 1,
+    slug: 'pubg-battlegrounds',
     title: 'PUBG: BATTLEGROUNDS',
     isFree: true,
     finalPrice: 0,
@@ -180,6 +182,7 @@ const MOCK_TOP_SELLERS: MockTopSeller[] = [
   },
   {
     id: 2,
+    slug: 'crimson-desert',
     title: 'Crimson Desert',
     isFree: false,
     finalPrice: 79000,
@@ -187,6 +190,7 @@ const MOCK_TOP_SELLERS: MockTopSeller[] = [
   },
   {
     id: 3,
+    slug: 'slay-the-spire-2',
     title: 'Slay the Spire 2',
     isFree: false,
     finalPrice: 27000,
@@ -202,6 +206,7 @@ function RecommendationsDropdown() {
     games && games.length >= 3
       ? games.slice(0, 3).map((g) => ({
           id: g.id,
+          slug: g.slug,
           title: g.title,
           isFree: g.price.isFree,
           finalPrice: g.price.final,
@@ -218,7 +223,7 @@ function RecommendationsDropdown() {
           {topSellers.map((g) => (
             <Link
               key={g.id}
-              href={`/game/${g.id}`}
+              href={`/app/${g.id}/${g.slug}`}
               className="flex items-center gap-2 py-1 rounded hover:bg-[#2a475e]/40 transition-colors group"
             >
               <img

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { ThumbsUp, ThumbsDown, ChevronLeft, ChevronRight, Heart, ShoppingCart } from 'lucide-react'
-import { useGame } from '@/hooks/useGames'
+import { AnimatePresence, motion } from 'motion/react'
+import { ThumbsUp, ThumbsDown, ChevronLeft, ChevronRight, Heart, ShoppingCart, Play, Volume2, VolumeX } from 'lucide-react'
+import { useGame, useAllGames } from '@/hooks/useGames'
 import { useGameReviews } from '@/hooks/useReviews'
 import { addToCartAtom } from '@/stores/cartStore'
 import { toggleWishlistAtom, isWishlistedAtom } from '@/stores/wishlistStore'
@@ -12,12 +13,17 @@ import { isSignedInAtom } from '@/stores/userStore'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { getRatingColor } from '@/lib/utils'
 import { RatingBadge } from '@/components/shared/RatingBadge'
 import { PriceDisplay } from '@/components/shared/PriceDisplay'
 import { PlatformIcons } from '@/components/shared/PlatformIcons'
-import type { Game, Review } from '@steam-clone/types'
+import type { Game, GameVideo, Review } from '@steam-clone/types'
+
+type MediaItem =
+  | { kind: 'video'; data: GameVideo }
+  | { kind: 'image'; src: string }
 
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
@@ -73,35 +79,97 @@ function PriceBlock({ game }: { game: Game }) {
 // ─── Media Carousel ──────────────────────────────────────────────────────────
 
 function MediaCarousel({ game }: { game: Game }) {
-  const [activeIdx, setActiveIdx] = useState(0)
-  const media = game.screenshots
+  const media: MediaItem[] = useMemo(
+    () => [
+      ...game.videos.map((v) => ({ kind: 'video' as const, data: v })),
+      ...game.screenshots.map((s) => ({ kind: 'image' as const, src: s })),
+    ],
+    [game.videos, game.screenshots]
+  )
 
-  function prev() { setActiveIdx(i => (i - 1 + media.length) % media.length) }
-  function next() { setActiveIdx(i => (i + 1) % media.length) }
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [muted, setMuted] = useState(true)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const active = media[activeIdx]
+
+  // Reset to first item if game changes
+  useEffect(() => {
+    setActiveIdx(0)
+  }, [game.id])
+
+  // Auto-play video when active
+  useEffect(() => {
+    if (active?.kind === 'video' && videoRef.current) {
+      videoRef.current.muted = muted
+      videoRef.current.play().catch(() => {/* autoplay blocked */})
+    }
+  }, [active, muted])
+
+  if (media.length === 0) return null
+
+  function prev() { setActiveIdx((i) => (i - 1 + media.length) % media.length) }
+  function next() { setActiveIdx((i) => (i + 1) % media.length) }
 
   return (
     <div>
       {/* Main viewer */}
       <div className="relative bg-black aspect-video w-full overflow-hidden group">
-        <img
-          key={activeIdx}
-          src={media[activeIdx]}
-          alt={`Screenshot ${activeIdx + 1}`}
-          className="w-full h-full object-cover"
-        />
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={activeIdx}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="absolute inset-0"
+          >
+            {active.kind === 'video' ? (
+              <video
+                ref={videoRef}
+                src={active.data.mp4}
+                poster={active.data.thumbnail}
+                muted={muted}
+                playsInline
+                loop
+                controls
+                className="w-full h-full object-cover bg-black"
+              />
+            ) : (
+              <img
+                src={active.src}
+                alt={`Screenshot ${activeIdx + 1}`}
+                className="w-full h-full object-cover"
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {active.kind === 'video' && (
+          <Button
+            variant="ghost"
+            onClick={() => setMuted((m) => !m)}
+            aria-label={muted ? 'Unmute' : 'Mute'}
+            className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-black/60 hover:bg-black/85 rounded-full p-0"
+          >
+            {muted ? <VolumeX size={15} className="text-white" /> : <Volume2 size={15} className="text-white" />}
+          </Button>
+        )}
+
         {media.length > 1 && (
           <>
             <Button
               variant="ghost"
               onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label="Previous media"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity p-0"
             >
               <ChevronLeft size={18} className="text-white" />
             </Button>
             <Button
               variant="ghost"
               onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-label="Next media"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-black/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity p-0"
             >
               <ChevronRight size={18} className="text-white" />
             </Button>
@@ -112,17 +180,26 @@ function MediaCarousel({ game }: { game: Game }) {
       {/* Thumbnail strip */}
       <ScrollArea className="bg-[#0e1825] mt-1">
         <div className="flex gap-1 p-1">
-          {media.map((src, i) => (
+          {media.map((m, i) => (
             <Button
               key={i}
               variant="ghost"
               onClick={() => setActiveIdx(i)}
               className={cn(
-                'shrink-0 w-[116px] h-[65px] overflow-hidden rounded-sm border-2 transition-colors p-0',
+                'shrink-0 w-[116px] h-[65px] overflow-hidden rounded-sm border-2 transition-colors p-0 relative group/thumb',
                 activeIdx === i ? 'border-steam-blue' : 'border-transparent opacity-60 hover:opacity-100'
               )}
             >
-              <img src={src} alt="" className="w-full h-full object-cover" />
+              <img
+                src={m.kind === 'video' ? m.data.thumbnail : m.src}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+              {m.kind === 'video' && (
+                <span className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover/thumb:bg-black/10 transition-colors">
+                  <Play size={20} className="text-white drop-shadow" fill="currentColor" />
+                </span>
+              )}
             </Button>
           ))}
         </div>
@@ -348,9 +425,13 @@ function AboutSection({ game }: { game: Game }) {
 
 // ─── System Requirements ──────────────────────────────────────────────────────
 
-function SystemRequirements() {
-  const cols = [
-    {
+type ReqRow = [string, string]
+type ReqColumn = { label: string; rows: ReqRow[] }
+type ReqSpec = { min: ReqColumn; rec: ReqColumn }
+
+const PLATFORM_REQS: Record<'windows' | 'mac' | 'linux', ReqSpec> = {
+  windows: {
+    min: {
       label: 'Minimum',
       rows: [
         ['OS:', 'Windows 10 64-bit'],
@@ -361,7 +442,7 @@ function SystemRequirements() {
         ['Storage:', '15 GB available space'],
       ],
     },
-    {
+    rec: {
       label: 'Recommended',
       rows: [
         ['OS:', 'Windows 11 64-bit'],
@@ -372,28 +453,112 @@ function SystemRequirements() {
         ['Storage:', '15 GB available space'],
       ],
     },
-  ]
+  },
+  mac: {
+    min: {
+      label: 'Minimum',
+      rows: [
+        ['OS:', 'macOS 12 Monterey'],
+        ['Processor:', 'Apple M1 / Intel Core i5'],
+        ['Memory:', '8 GB RAM'],
+        ['Graphics:', 'Integrated GPU (Apple M1) / Radeon Pro 560'],
+        ['Storage:', '15 GB available space'],
+      ],
+    },
+    rec: {
+      label: 'Recommended',
+      rows: [
+        ['OS:', 'macOS 14 Sonoma'],
+        ['Processor:', 'Apple M2 Pro or newer'],
+        ['Memory:', '16 GB RAM'],
+        ['Graphics:', 'Apple M2 Pro 16-core GPU'],
+        ['Storage:', '15 GB available space'],
+      ],
+    },
+  },
+  linux: {
+    min: {
+      label: 'Minimum',
+      rows: [
+        ['OS:', 'SteamOS 3, Ubuntu 22.04+'],
+        ['Processor:', 'Intel Core i5-4670K / AMD Ryzen 5 1600'],
+        ['Memory:', '8 GB RAM'],
+        ['Graphics:', 'NVIDIA GTX 970 (Vulkan) / AMD RX 480'],
+        ['Storage:', '15 GB available space'],
+      ],
+    },
+    rec: {
+      label: 'Recommended',
+      rows: [
+        ['OS:', 'SteamOS 3, Ubuntu 24.04'],
+        ['Processor:', 'Intel Core i7-9700K / AMD Ryzen 7 3700X'],
+        ['Memory:', '16 GB RAM'],
+        ['Graphics:', 'NVIDIA RTX 2070 (Vulkan) / AMD RX 5700 XT'],
+        ['Storage:', '15 GB available space'],
+      ],
+    },
+  },
+}
+
+const PLATFORM_LABELS: Record<'windows' | 'mac' | 'linux', string> = {
+  windows: 'Windows',
+  mac: 'macOS',
+  linux: 'SteamOS + Linux',
+}
+
+function ReqColumnView({ col }: { col: ReqColumn }) {
+  return (
+    <div>
+      <p className="text-steam-text text-[13px] font-semibold mb-2">{col.label}:</p>
+      <dl className="space-y-1">
+        {col.rows.map(([term, def]) => (
+          <div key={term} className="flex gap-2 text-[12px]">
+            <dt className="text-steam-textDim w-24 shrink-0">{term}</dt>
+            <dd className="text-steam-textMuted">{def}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  )
+}
+
+function SystemRequirements({ game }: { game: Game }) {
+  const supported = (['windows', 'mac', 'linux'] as const).filter(
+    (p) => game.platforms[p]
+  )
+  if (supported.length === 0) return null
+  const defaultPlatform = supported[0]
 
   return (
     <div className="mt-8">
       <h2 className="text-steam-text text-[16px] font-semibold mb-3 pb-2 border-b border-steam-borderSubtle">
         System Requirements
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {cols.map(col => (
-          <div key={col.label}>
-            <p className="text-steam-text text-[13px] font-semibold mb-2">{col.label}:</p>
-            <dl className="space-y-1">
-              {col.rows.map(([term, def]) => (
-                <div key={term} className="flex gap-2 text-[12px]">
-                  <dt className="text-steam-textDim w-24 shrink-0">{term}</dt>
-                  <dd className="text-steam-textMuted">{def}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+      <Tabs defaultValue={defaultPlatform}>
+        <TabsList className="bg-steam-card rounded-sm p-0.5 h-auto justify-start">
+          {supported.map((p) => (
+            <TabsTrigger
+              key={p}
+              value={p}
+              className={cn(
+                'px-3 py-1.5 text-[12px] rounded-sm transition-colors',
+                'data-[state=active]:bg-steam-blue/85 data-[state=active]:text-white data-[state=active]:shadow-none',
+                'data-[state=inactive]:text-steam-textMuted data-[state=inactive]:hover:text-steam-text'
+              )}
+            >
+              {PLATFORM_LABELS[p]}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {supported.map((p) => (
+          <TabsContent key={p} value={p} className="mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ReqColumnView col={PLATFORM_REQS[p].min} />
+              <ReqColumnView col={PLATFORM_REQS[p].rec} />
+            </div>
+          </TabsContent>
         ))}
-      </div>
+      </Tabs>
     </div>
   )
 }
@@ -443,9 +608,35 @@ function ReviewCard({ review }: { review: Review }) {
 
 // ─── Reviews Section ──────────────────────────────────────────────────────────
 
+type ReviewSort = 'helpful' | 'recent' | 'funny'
+
+const SORT_OPTIONS: { value: ReviewSort; label: string }[] = [
+  { value: 'helpful', label: 'Most Helpful' },
+  { value: 'recent', label: 'Most Recent' },
+  { value: 'funny', label: 'Funny' },
+]
+
+function sortReviews(reviews: Review[], sort: ReviewSort): Review[] {
+  const copy = [...reviews]
+  switch (sort) {
+    case 'helpful':
+      return copy.sort((a, b) => b.helpful - a.helpful)
+    case 'recent':
+      return copy.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+    case 'funny':
+      return copy.sort((a, b) => b.funny - a.funny)
+  }
+}
+
 function ReviewsSection({ game }: { game: Game }) {
   const { data: reviews, isLoading } = useGameReviews(game.id)
+  const [sort, setSort] = useState<ReviewSort>('helpful')
   const rc = getRatingColor(game.rating.summary)
+
+  const sortedReviews = useMemo(
+    () => (reviews ? sortReviews(reviews, sort) : []),
+    [reviews, sort]
+  )
 
   return (
     <div className="mt-8">
@@ -466,6 +657,38 @@ function ReviewsSection({ game }: { game: Game }) {
         </div>
       </div>
 
+      {/* Sort bar */}
+      {reviews && reviews.length > 0 && (
+        <div className="flex items-center gap-2 mb-3 text-[12px]">
+          <span className="text-steam-textDim uppercase tracking-wider text-[10px]">Sort by:</span>
+          <div className="flex items-center gap-1 bg-steam-card rounded-sm p-0.5">
+            {SORT_OPTIONS.map((opt) => (
+              <Button
+                key={opt.value}
+                variant="ghost"
+                onClick={() => setSort(opt.value)}
+                className={cn(
+                  'relative px-3 py-1 h-auto rounded-sm text-[12px] transition-colors',
+                  sort === opt.value
+                    ? 'text-white'
+                    : 'text-steam-textMuted hover:text-steam-text'
+                )}
+              >
+                {sort === opt.value && (
+                  <motion.span
+                    layoutId="review-sort-pill"
+                    className="absolute inset-0 bg-steam-blue/80 rounded-sm"
+                    transition={{ type: 'spring', stiffness: 480, damping: 36 }}
+                  />
+                )}
+                <span className="relative">{opt.label}</span>
+              </Button>
+            ))}
+          </div>
+          <span className="text-steam-textDim ml-auto">{sortedReviews.length} shown</span>
+        </div>
+      )}
+
       {/* Review grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -473,15 +696,92 @@ function ReviewsSection({ game }: { game: Game }) {
             <Skeleton key={i} className="h-[160px] bg-steam-card rounded-sm" />
           ))}
         </div>
-      ) : reviews && reviews.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {reviews.map(r => <ReviewCard key={r.id} review={r} />)}
-        </div>
+      ) : sortedReviews.length > 0 ? (
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <AnimatePresence initial={false}>
+            {sortedReviews.map((r) => (
+              <motion.div
+                key={r.id}
+                layout
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+              >
+                <ReviewCard review={r} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       ) : (
         <div className="text-steam-textMuted text-[13px] text-center py-8">
           No reviews yet for this game.
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── More Like This ───────────────────────────────────────────────────────────
+
+function RelatedCard({ game }: { game: Game }) {
+  const rc = getRatingColor(game.rating.summary)
+  return (
+    <Link
+      href={`/app/${game.id}/${game.slug}`}
+      className="shrink-0 w-[268px] bg-steam-card hover:bg-steam-cardHover transition-colors rounded-sm overflow-hidden group"
+    >
+      <div className="relative aspect-[460/215] bg-black overflow-hidden">
+        <img
+          src={game.headerImage}
+          alt={game.title}
+          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+      <div className="p-3 flex flex-col gap-1.5">
+        <p className="text-steam-text text-[13px] font-semibold leading-tight line-clamp-1">
+          {game.title}
+        </p>
+        <p className="text-[11px] font-semibold" style={{ color: rc }}>
+          {game.rating.summary}
+        </p>
+        <div className="mt-1">
+          <PriceDisplay price={game.price} size="sm" />
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+function RelatedGames({ game }: { game: Game }) {
+  const { data: allGames, isLoading } = useAllGames()
+
+  const related = useMemo(() => {
+    if (!allGames) return []
+    const currentGenres = new Set(game.genres.map((g) => g.id))
+    return allGames
+      .filter((g) => g.id !== game.id && g.genres.some((gn) => currentGenres.has(gn.id)))
+      .slice(0, 8)
+  }, [allGames, game.genres, game.id])
+
+  if (!isLoading && related.length === 0) return null
+
+  return (
+    <div className="mt-10">
+      <h2 className="text-steam-text text-[16px] font-semibold mb-3 pb-2 border-b border-steam-borderSubtle">
+        More Like This
+      </h2>
+      <ScrollArea>
+        <div className="flex gap-3 pb-3">
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="shrink-0 w-[268px] h-[210px] bg-steam-card rounded-sm" />
+              ))
+            : related.map((g) => <RelatedCard key={g.id} game={g} />)}
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
     </div>
   )
 }
@@ -607,8 +907,9 @@ export function GameDetailPage({ gameId }: { gameId: number }) {
           <div className="flex-1 min-w-0">
             <UpdatesSection game={game} />
             <AboutSection game={game} />
-            <SystemRequirements />
+            <SystemRequirements game={game} />
             <ReviewsSection game={game} />
+            <RelatedGames game={game} />
           </div>
 
           {/* Right info sidebar */}

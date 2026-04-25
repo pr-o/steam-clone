@@ -15,7 +15,14 @@ export const MOCK_GAMES: Game[] = [
       'https://placehold.co/616x353/16202d/c7d5e0?text=CS2+Screenshot+2',
       'https://placehold.co/616x353/16202d/c7d5e0?text=CS2+Screenshot+3',
     ],
-    videos: [],
+    videos: [
+      {
+        id: 1,
+        thumbnail: 'https://placehold.co/616x353/0a0d11/66c0f4?text=%E2%96%B6%20CS2%20Trailer',
+        mp4: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        webm: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      },
+    ],
     developer: 'Valve',
     publisher: 'Valve',
     releaseDate: '2023-09-27',
@@ -41,7 +48,14 @@ export const MOCK_GAMES: Game[] = [
       'https://placehold.co/616x353/16202d/c7d5e0?text=Dota2+Screenshot+1',
       'https://placehold.co/616x353/16202d/c7d5e0?text=Dota2+Screenshot+2',
     ],
-    videos: [],
+    videos: [
+      {
+        id: 1,
+        thumbnail: 'https://placehold.co/616x353/0a0d11/66c0f4?text=%E2%96%B6%20Dota%202%20Trailer',
+        mp4: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        webm: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+      },
+    ],
     developer: 'Valve',
     publisher: 'Valve',
     releaseDate: '2013-07-09',
@@ -67,7 +81,14 @@ export const MOCK_GAMES: Game[] = [
       'https://placehold.co/616x353/16202d/c7d5e0?text=TF2+Screenshot+1',
       'https://placehold.co/616x353/16202d/c7d5e0?text=TF2+Screenshot+2',
     ],
-    videos: [],
+    videos: [
+      {
+        id: 1,
+        thumbnail: 'https://placehold.co/616x353/0a0d11/66c0f4?text=%E2%96%B6%20TF2%20Trailer',
+        mp4: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        webm: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      },
+    ],
     developer: 'Valve',
     publisher: 'Valve',
     releaseDate: '2007-10-10',
