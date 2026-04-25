@@ -3,7 +3,8 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { SlidersHorizontal, ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useAllGames, useSearchGames } from '@/hooks/useGames'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -26,6 +27,7 @@ type PriceFilter = 'any' | 'free' | 'under5' | 'under10' | 'under20' | 'sale'
 function applyFilters(
   games: Game[],
   price: PriceFilter,
+  genres: string[],
   tags: string[],
   os: string[],
   sort: SortKey
@@ -38,6 +40,11 @@ function applyFilters(
   else if (price === 'under10') result = result.filter(g => g.price.final <= 1000)
   else if (price === 'under20') result = result.filter(g => g.price.final <= 2000)
   else if (price === 'sale') result = result.filter(g => g.price.discountPercent > 0)
+
+  // Genres
+  if (genres.length > 0) {
+    result = result.filter(g => genres.some(name => g.genres.some(gn => gn.description === name)))
+  }
 
   // Tags
   if (tags.length > 0) {
@@ -120,11 +127,6 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
 
 // ─── Filter Sidebar ───────────────────────────────────────────────────────────
 
-const ALL_TAGS = [
-  'Action', 'RPG', 'Strategy', 'Simulation', 'Indie',
-  'Multiplayer', 'Singleplayer', 'Open World', 'FPS', 'Adventure',
-]
-
 const PRICE_OPTIONS: { value: PriceFilter; label: string }[] = [
   { value: 'any', label: 'Any Price' },
   { value: 'free', label: 'Free to Play' },
@@ -134,15 +136,29 @@ const PRICE_OPTIONS: { value: PriceFilter; label: string }[] = [
   { value: 'under20', label: 'Under $20' },
 ]
 
+const PRICE_LABELS: Record<PriceFilter, string> = {
+  any: 'Any Price',
+  free: 'Free to Play',
+  sale: 'Special Offers',
+  under5: 'Under $5',
+  under10: 'Under $10',
+  under20: 'Under $20',
+}
+
 function FilterSidebar({
   price, setPrice,
-  tags, setTags,
+  genres, setGenres, allGenres,
+  tags, setTags, allTags,
   os, setOs,
 }: {
   price: PriceFilter; setPrice: (p: PriceFilter) => void
-  tags: string[]; setTags: (t: string[]) => void
+  genres: string[]; setGenres: (g: string[]) => void; allGenres: string[]
+  tags: string[]; setTags: (t: string[]) => void; allTags: string[]
   os: string[]; setOs: (o: string[]) => void
 }) {
+  function toggleGenre(name: string) {
+    setGenres(genres.includes(name) ? genres.filter(g => g !== name) : [...genres, name])
+  }
   function toggleTag(tag: string) {
     setTags(tags.includes(tag) ? tags.filter(t => t !== tag) : [...tags, tag])
   }
@@ -176,23 +192,45 @@ function FilterSidebar({
         </RadioGroup>
       </FilterSection>
 
-      <FilterSection title="Narrow by Tag">
-        <div className="flex flex-col gap-1">
-          {ALL_TAGS.map(tag => (
-            <label key={tag} className="flex items-center gap-2 cursor-pointer group/tag">
-              <input
-                type="checkbox"
-                checked={tags.includes(tag)}
-                onChange={() => toggleTag(tag)}
-                className="accent-steam-blue"
-              />
-              <span className={cn('text-[12px] transition-colors', tags.includes(tag) ? 'text-steam-text' : 'text-steam-textMuted group-hover/tag:text-steam-text')}>
-                {tag}
-              </span>
-            </label>
-          ))}
-        </div>
-      </FilterSection>
+      {allGenres.length > 0 && (
+        <FilterSection title="Narrow by Genre">
+          <div className="flex flex-col gap-1 max-h-[180px] overflow-y-auto pr-1">
+            {allGenres.map(name => (
+              <label key={name} className="flex items-center gap-2 cursor-pointer group/genre">
+                <input
+                  type="checkbox"
+                  checked={genres.includes(name)}
+                  onChange={() => toggleGenre(name)}
+                  className="accent-steam-blue"
+                />
+                <span className={cn('text-[12px] transition-colors', genres.includes(name) ? 'text-steam-text' : 'text-steam-textMuted group-hover/genre:text-steam-text')}>
+                  {name}
+                </span>
+              </label>
+            ))}
+          </div>
+        </FilterSection>
+      )}
+
+      {allTags.length > 0 && (
+        <FilterSection title="Narrow by Tag">
+          <div className="flex flex-col gap-1 max-h-[220px] overflow-y-auto pr-1">
+            {allTags.map(tag => (
+              <label key={tag} className="flex items-center gap-2 cursor-pointer group/tag">
+                <input
+                  type="checkbox"
+                  checked={tags.includes(tag)}
+                  onChange={() => toggleTag(tag)}
+                  className="accent-steam-blue"
+                />
+                <span className={cn('text-[12px] transition-colors', tags.includes(tag) ? 'text-steam-text' : 'text-steam-textMuted group-hover/tag:text-steam-text')}>
+                  {tag}
+                </span>
+              </label>
+            ))}
+          </div>
+        </FilterSection>
+      )}
 
       <FilterSection title="Narrow by OS">
         {(['windows', 'mac', 'linux'] as const).map(name => (
@@ -213,6 +251,49 @@ function FilterSidebar({
   )
 }
 
+// ─── Active Filter Chips ──────────────────────────────────────────────────────
+
+interface ActiveChip {
+  key: string
+  label: string
+  onRemove: () => void
+}
+
+function ActiveFilterChips({ chips, onClearAll }: { chips: ActiveChip[]; onClearAll: () => void }) {
+  return (
+    <motion.div layout className="flex items-center flex-wrap gap-1.5 mb-3">
+      <span className="text-steam-textDim text-[11px] uppercase tracking-wider mr-1">Filters:</span>
+      <AnimatePresence initial={false}>
+        {chips.map((chip) => (
+          <motion.button
+            key={chip.key}
+            layout
+            type="button"
+            onClick={chip.onRemove}
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.16 }}
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm bg-steam-blue/15 hover:bg-steam-blue/25 border border-steam-blue/40 text-steam-accentPale text-[11px] transition-colors"
+          >
+            {chip.label}
+            <X size={11} />
+          </motion.button>
+        ))}
+      </AnimatePresence>
+      {chips.length > 1 && (
+        <Button
+          variant="ghost"
+          onClick={onClearAll}
+          className="text-steam-link hover:text-steam-linkHover text-[11px] transition-colors h-auto p-0 ml-1"
+        >
+          Clear all
+        </Button>
+      )}
+    </motion.div>
+  )
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function SearchPageClient() {
@@ -221,6 +302,7 @@ export function SearchPageClient() {
 
   const [sort, setSort] = useState<SortKey>('relevance')
   const [price, setPrice] = useState<PriceFilter>('any')
+  const [genres, setGenres] = useState<string[]>([])
   const [tags, setTags] = useState<string[]>([])
   const [os, setOs] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
@@ -231,10 +313,53 @@ export function SearchPageClient() {
   const baseGames = query.length > 1 ? searchResults : allGames
   const isLoading = query.length > 1 ? searchLoading : allLoading
 
+  const { allGenres, allTags } = useMemo(() => {
+    const gMap = new Map<string, number>()
+    const tMap = new Map<string, number>()
+    for (const game of allGames ?? []) {
+      for (const g of game.genres) gMap.set(g.description, (gMap.get(g.description) ?? 0) + 1)
+      for (const t of game.tags) tMap.set(t.name, (tMap.get(t.name) ?? 0) + 1)
+    }
+    const sortByCount = (m: Map<string, number>) =>
+      [...m.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name)
+    return {
+      allGenres: sortByCount(gMap),
+      allTags: sortByCount(tMap).slice(0, 20),
+    }
+  }, [allGames])
+
   const filtered = useMemo(
-    () => applyFilters(baseGames ?? [], price, tags, os, sort),
-    [baseGames, price, tags, os, sort]
+    () => applyFilters(baseGames ?? [], price, genres, tags, os, sort),
+    [baseGames, price, genres, tags, os, sort]
   )
+
+  function clearAll() {
+    setPrice('any')
+    setGenres([])
+    setTags([])
+    setOs([])
+  }
+
+  const chips: ActiveChip[] = [
+    ...(price !== 'any'
+      ? [{ key: `price:${price}`, label: PRICE_LABELS[price], onRemove: () => setPrice('any') }]
+      : []),
+    ...genres.map((g) => ({
+      key: `genre:${g}`,
+      label: g,
+      onRemove: () => setGenres(genres.filter((x) => x !== g)),
+    })),
+    ...tags.map((t) => ({
+      key: `tag:${t}`,
+      label: t,
+      onRemove: () => setTags(tags.filter((x) => x !== t)),
+    })),
+    ...os.map((o) => ({
+      key: `os:${o}`,
+      label: o.charAt(0).toUpperCase() + o.slice(1),
+      onRemove: () => setOs(os.filter((x) => x !== o)),
+    })),
+  ]
 
   return (
     <div className="max-w-[940px] mx-auto px-4 sm:px-0 py-4">
@@ -276,6 +401,9 @@ export function SearchPageClient() {
         </div>
       </div>
 
+      {/* Active filter chips */}
+      {chips.length > 0 && <ActiveFilterChips chips={chips} onClearAll={clearAll} />}
+
       {/* Two-column layout */}
       <div className="flex gap-4 items-start">
         {/* Results list */}
@@ -294,14 +422,29 @@ export function SearchPageClient() {
               <p className="text-steam-textMuted text-[14px]">No results match your filters.</p>
               <Button
                 variant="ghost"
-                onClick={() => { setPrice('any'); setTags([]); setOs([]) }}
+                onClick={clearAll}
                 className="mt-3 text-steam-link hover:text-steam-linkHover text-[12px] transition-colors"
               >
                 Clear filters
               </Button>
             </div>
           ) : (
-            filtered.map(game => <ResultRow key={game.id} game={game} />)
+            <motion.div layout>
+              <AnimatePresence initial={false}>
+                {filtered.map((game) => (
+                  <motion.div
+                    key={game.id}
+                    layout
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                  >
+                    <ResultRow game={game} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           )}
         </div>
 
@@ -310,7 +453,8 @@ export function SearchPageClient() {
           <ScrollArea className="max-h-[calc(100vh-140px)]">
             <FilterSidebar
               price={price} setPrice={setPrice}
-              tags={tags} setTags={setTags}
+              genres={genres} setGenres={setGenres} allGenres={allGenres}
+              tags={tags} setTags={setTags} allTags={allTags}
               os={os} setOs={setOs}
             />
           </ScrollArea>
