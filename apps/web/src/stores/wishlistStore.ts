@@ -1,7 +1,11 @@
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
+import { MOCK_USER } from '@/mocks/data/users'
 
-export const wishlistAtom = atomWithStorage<number[]>('steam-clone:wishlist', [])
+export const wishlistAtom = atomWithStorage<number[]>(
+  'steam-clone:wishlist',
+  MOCK_USER.wishlist
+)
 
 export const toggleWishlistAtom = atom(null, (get, set, gameId: number) => {
   const list = get(wishlistAtom)

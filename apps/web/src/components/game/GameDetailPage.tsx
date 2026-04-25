@@ -7,8 +7,9 @@ import { AnimatePresence, motion } from 'motion/react'
 import { ThumbsUp, ThumbsDown, ChevronLeft, ChevronRight, Heart, ShoppingCart, Play, Volume2, VolumeX } from 'lucide-react'
 import { useGame, useAllGames } from '@/hooks/useGames'
 import { useGameReviews } from '@/hooks/useReviews'
-import { addToCartAtom } from '@/stores/cartStore'
+import { addToCartAtom, cartItemsAtom } from '@/stores/cartStore'
 import { toggleWishlistAtom, isWishlistedAtom } from '@/stores/wishlistStore'
+import { isOwnedAtom } from '@/stores/purchasesStore'
 import { isSignedInAtom } from '@/stores/userStore'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
@@ -29,6 +30,26 @@ type MediaItem =
 
 function PriceBlock({ game }: { game: Game }) {
   const addToCart = useSetAtom(addToCartAtom)
+  const isOwned = useAtomValue(useMemo(() => isOwnedAtom(game.id), [game.id]))
+  const cartItems = useAtomValue(cartItemsAtom)
+  const inCart = cartItems.some((i) => i.gameId === game.id)
+
+  if (isOwned) {
+    return (
+      <div className="mt-4">
+        <div className="text-steam-online font-bold text-[12px] uppercase tracking-wider mb-2">
+          In Library
+        </div>
+        <Link
+          href="/account/library"
+          className="block w-full text-center text-[13px] font-semibold text-white bg-[#5c7e10] hover:bg-[#6b9313] py-2 rounded-sm transition-colors"
+        >
+          Play Game
+        </Link>
+      </div>
+    )
+  }
+
   if (game.price.isFree) {
     return (
       <div className="mt-4">
@@ -42,12 +63,21 @@ function PriceBlock({ game }: { game: Game }) {
       </div>
     )
   }
-  if (game.price.discountPercent > 0) {
-    return (
-      <div className="mt-4">
-        <div className="mb-2">
-          <PriceDisplay price={game.price} size="lg" />
-        </div>
+
+  return (
+    <div className="mt-4">
+      <div className="mb-2">
+        <PriceDisplay price={game.price} size="lg" />
+      </div>
+      {inCart ? (
+        <Link
+          href="/cart"
+          className="w-full text-[13px] font-semibold text-steam-text bg-steam-card hover:bg-steam-cardHover border border-steam-borderSubtle hover:border-steam-text py-2 rounded-sm transition-colors flex items-center justify-center gap-2"
+        >
+          <ShoppingCart size={14} />
+          In Cart — View →
+        </Link>
+      ) : (
         <Button
           variant="ghost"
           onClick={() => addToCart(game)}
@@ -56,22 +86,7 @@ function PriceBlock({ game }: { game: Game }) {
           <ShoppingCart size={14} />
           Add to Cart
         </Button>
-      </div>
-    )
-  }
-  return (
-    <div className="mt-4">
-      <div className="mb-2">
-        <PriceDisplay price={game.price} size="lg" />
-      </div>
-      <Button
-        variant="ghost"
-        onClick={() => addToCart(game)}
-        className="w-full text-[13px] font-semibold text-white bg-[#5c7e10] hover:bg-[#6b9313] py-2 rounded-sm transition-colors flex items-center justify-center gap-2"
-      >
-        <ShoppingCart size={14} />
-        Add to Cart
-      </Button>
+      )}
     </div>
   )
 }

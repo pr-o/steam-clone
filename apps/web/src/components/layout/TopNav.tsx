@@ -2,12 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useAtom } from 'jotai'
-import { Menu } from 'lucide-react'
+import { useAtom, useAtomValue } from 'jotai'
+import { AnimatePresence, motion } from 'motion/react'
+import { Menu, ShoppingCart } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { mobileNavOpenAtom } from '@/stores/uiStore'
 import { isSignedInAtom } from '@/stores/userStore'
+import { cartCountAtom } from '@/stores/cartStore'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
@@ -21,6 +23,7 @@ export function TopNav() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useAtom(mobileNavOpenAtom)
   const [isSignedIn] = useAtom(isSignedInAtom)
+  const cartCount = useAtomValue(cartCountAtom)
 
   return (
     <nav
@@ -64,6 +67,32 @@ export function TopNav() {
 
         {/* Right cluster */}
         <div className="hidden md:flex items-center gap-3 ml-auto shrink-0">
+          <Link
+            href="/cart"
+            aria-label={`Cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
+            className={cn(
+              'relative inline-flex items-center justify-center h-[26px] w-[26px] rounded-sm transition-colors',
+              pathname.startsWith('/cart')
+                ? 'text-white bg-[#395873]'
+                : 'text-steam-navDefault hover:text-white hover:bg-white/5'
+            )}
+          >
+            <ShoppingCart size={14} />
+            <AnimatePresence>
+              {cartCount > 0 && (
+                <motion.span
+                  key={cartCount}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 480, damping: 22 }}
+                  className="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-1 rounded-full bg-steam-blue text-white text-[9px] font-bold flex items-center justify-center pointer-events-none tabular-nums"
+                >
+                  {cartCount > 99 ? '99+' : cartCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Link>
           <Link
             href="/about/download"
             className="h-[26px] px-3 flex items-center gap-1.5 text-[11px] font-semibold text-white rounded-sm transition-brightness"

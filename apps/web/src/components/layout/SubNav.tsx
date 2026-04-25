@@ -148,7 +148,7 @@ function BrowseDropdown() {
           <Link href="#" className={linkCls}>
             My Preferences
           </Link>
-          <Link href="/cart" className={linkCls}>
+          <Link href="/wishlist" className={linkCls}>
             My Wishlist
           </Link>
           <Link href="#" className={linkCls}>
