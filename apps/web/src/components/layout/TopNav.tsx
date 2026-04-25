@@ -12,11 +12,16 @@ import { isSignedInAtom } from '@/stores/userStore'
 import { cartCountAtom } from '@/stores/cartStore'
 import { cn } from '@/lib/utils'
 
-const NAV_LINKS = [
+const BASE_LINKS = [
   { label: 'STORE', href: '/' },
   { label: 'COMMUNITY', href: '/community' },
   { label: 'ABOUT', href: '/about' },
   { label: 'SUPPORT', href: '/support' },
+]
+
+const AUTH_LINKS = [
+  { label: 'LIBRARY', href: '/account/library' },
+  { label: 'WISHLIST', href: '/wishlist' },
 ]
 
 export function TopNav() {
@@ -24,6 +29,7 @@ export function TopNav() {
   const [mobileOpen, setMobileOpen] = useAtom(mobileNavOpenAtom)
   const [isSignedIn] = useAtom(isSignedInAtom)
   const cartCount = useAtomValue(cartCountAtom)
+  const navLinks = isSignedIn ? [...BASE_LINKS, ...AUTH_LINKS] : BASE_LINKS
 
   return (
     <nav
@@ -45,7 +51,7 @@ export function TopNav() {
 
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center h-full flex-1">
-          {NAV_LINKS.map(({ label, href }) => {
+          {navLinks.map(({ label, href }) => {
             const isActive =
               href === '/' ? pathname === '/' : pathname.startsWith(href)
             return (
@@ -148,7 +154,7 @@ export function TopNav() {
                   <img src="/steam-logo.jpg" alt="Steam" className="h-5 w-5 object-contain rounded-sm" />
                   <span className="text-white font-bold text-sm tracking-[0.15em]">STEAM</span>
                 </div>
-                {NAV_LINKS.map(({ label, href }) => (
+                {navLinks.map(({ label, href }) => (
                   <Link
                     key={label}
                     href={href}
