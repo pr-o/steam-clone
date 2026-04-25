@@ -1,7 +1,8 @@
 import { atom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
 import type { CartItem, Game } from '@steam-clone/types'
 
-export const cartItemsAtom = atom<CartItem[]>([])
+export const cartItemsAtom = atomWithStorage<CartItem[]>('steam-clone:cart', [])
 
 export const cartCountAtom = atom(get => get(cartItemsAtom).length)
 

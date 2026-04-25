@@ -1,6 +1,7 @@
 import { atom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
 
-export const wishlistAtom = atom<number[]>([]) // array of gameIds
+export const wishlistAtom = atomWithStorage<number[]>('steam-clone:wishlist', [])
 
 export const toggleWishlistAtom = atom(null, (get, set, gameId: number) => {
   const list = get(wishlistAtom)
