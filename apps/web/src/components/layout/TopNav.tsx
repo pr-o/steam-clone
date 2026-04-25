@@ -65,34 +65,36 @@ export function TopNav() {
           })}
         </div>
 
-        {/* Right cluster */}
-        <div className="hidden md:flex items-center gap-3 ml-auto shrink-0">
-          <Link
-            href="/cart"
-            aria-label={`Cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
-            className={cn(
-              'relative inline-flex items-center justify-center h-[26px] w-[26px] rounded-sm transition-colors',
-              pathname.startsWith('/cart')
-                ? 'text-white bg-[#395873]'
-                : 'text-steam-navDefault hover:text-white hover:bg-white/5'
+        {/* Cart — always visible across breakpoints */}
+        <Link
+          href="/cart"
+          aria-label={`Cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`}
+          className={cn(
+            'relative inline-flex items-center justify-center h-[26px] w-[26px] rounded-sm transition-colors ml-auto md:ml-auto shrink-0',
+            pathname.startsWith('/cart')
+              ? 'text-white bg-[#395873]'
+              : 'text-steam-navDefault hover:text-white hover:bg-white/5'
+          )}
+        >
+          <ShoppingCart size={14} />
+          <AnimatePresence>
+            {cartCount > 0 && (
+              <motion.span
+                key={cartCount}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 480, damping: 22 }}
+                className="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-1 rounded-full bg-steam-blue text-white text-[9px] font-bold flex items-center justify-center pointer-events-none tabular-nums"
+              >
+                {cartCount > 99 ? '99+' : cartCount}
+              </motion.span>
             )}
-          >
-            <ShoppingCart size={14} />
-            <AnimatePresence>
-              {cartCount > 0 && (
-                <motion.span
-                  key={cartCount}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 480, damping: 22 }}
-                  className="absolute -top-1 -right-1 min-w-[14px] h-[14px] px-1 rounded-full bg-steam-blue text-white text-[9px] font-bold flex items-center justify-center pointer-events-none tabular-nums"
-                >
-                  {cartCount > 99 ? '99+' : cartCount}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </Link>
+          </AnimatePresence>
+        </Link>
+
+        {/* Right cluster — desktop only */}
+        <div className="hidden md:flex items-center gap-3 ml-3 shrink-0">
           <Link
             href="/about/download"
             className="h-[26px] px-3 flex items-center gap-1.5 text-[11px] font-semibold text-white rounded-sm transition-brightness"
@@ -126,7 +128,7 @@ export function TopNav() {
         </div>
 
         {/* Mobile hamburger */}
-        <div className="md:hidden ml-auto">
+        <div className="md:hidden ml-2">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button
