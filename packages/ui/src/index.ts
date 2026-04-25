@@ -10,3 +10,7 @@ export { cn, formatPrice, formatDate, formatGenreName, getRatingColor } from './
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 export { RATING_COLOR, GENRE_COLORS, SUB_GENRES, STEAM_COLORS } from './lib/constants'
+
+// ─── Checkout math ────────────────────────────────────────────────────────────
+export { TAX_RATE, calcOrderTotals, calcTotalsFromSubtotal } from './lib/checkout'
+export type { OrderTotals } from './lib/checkout'

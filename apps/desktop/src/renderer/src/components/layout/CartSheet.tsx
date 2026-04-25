@@ -25,7 +25,7 @@ import {
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
-import { formatPrice } from '@steam-clone/ui'
+import { formatPrice, calcTotalsFromSubtotal } from '@steam-clone/ui'
 import { cn } from '@renderer/lib/utils'
 import type { PurchasedGame } from '@steam-clone/types'
 
@@ -65,8 +65,7 @@ export function CartSheet() {
     }
   }, [open])
 
-  const tax = Math.round(total * 0.08)
-  const grand = total + tax
+  const { tax, grand } = calcTotalsFromSubtotal(total)
 
   function handlePlaceOrder() {
     if (isProcessing || items.length === 0) return

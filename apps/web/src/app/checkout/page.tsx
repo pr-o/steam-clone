@@ -11,6 +11,7 @@ import { checkoutAtom } from '@/stores/purchasesStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { formatPrice, cn } from '@/lib/utils'
+import { calcTotalsFromSubtotal } from '@steam-clone/ui'
 
 const PAYMENT_METHODS = [
   { id: 'card', label: 'Credit / Debit Card', subtitle: 'Visa, Mastercard, Amex' },
@@ -34,8 +35,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
 
   const isEmpty = items.length === 0
-  const tax = Math.round(total * 0.08)
-  const grand = total + tax
+  const { tax, grand } = calcTotalsFromSubtotal(total)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

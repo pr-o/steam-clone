@@ -8,6 +8,7 @@ import { motion } from 'motion/react'
 import { CheckCircle2, Download } from 'lucide-react'
 import { purchasesAtom } from '@/stores/purchasesStore'
 import { formatPrice } from '@/lib/utils'
+import { calcTotalsFromSubtotal } from '@steam-clone/ui'
 
 function SuccessContent() {
   const searchParams = useSearchParams()
@@ -123,7 +124,7 @@ function SuccessContent() {
         <div className="border-t border-steam-borderSubtle mt-3 pt-3 flex justify-between text-[13px]">
           <span className="text-steam-textMuted">Total charged</span>
           <span className="text-steam-text font-semibold">
-            {formatPrice(total + Math.round(total * 0.08))}
+            {formatPrice(calcTotalsFromSubtotal(total).grand)}
           </span>
         </div>
       </section>
