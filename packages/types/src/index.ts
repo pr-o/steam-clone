@@ -119,6 +119,17 @@ export interface Cart {
   total: number
 }
 
+// ─── Purchases / Library ──────────────────────────────────────────────────────
+
+export interface PurchasedGame {
+  gameId: number
+  game: Game
+  /** ISO timestamp */
+  purchasedAt: string
+  /** Final paid amount in the same minor units as Price.final */
+  totalPaid: number
+}
+
 // ─── Review ───────────────────────────────────────────────────────────────────
 
 export interface Review {

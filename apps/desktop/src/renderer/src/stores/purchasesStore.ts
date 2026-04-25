@@ -16,9 +16,9 @@ export const ownedGameIdsAtom = atom((get) =>
 export const isOwnedAtom = (gameId: number) =>
   atom((get) => get(ownedGameIdsAtom).has(gameId))
 
-// Moves the entire cart into purchases, clears the cart, and removes those
-// gameIds from the wishlist. Returns the just-purchased items so the caller
-// can render them on the confirmation screen.
+// Move all current cart contents into purchases, clear cart, drop owned IDs
+// from the wishlist. Returns the just-purchased items so a future desktop
+// checkout dialog can render them on a confirmation step.
 export const checkoutAtom = atom(null, (get, set): PurchasedGame[] => {
   const items = get(cartItemsAtom)
   if (items.length === 0) return []
@@ -31,7 +31,6 @@ export const checkoutAtom = atom(null, (get, set): PurchasedGame[] => {
     totalPaid: item.game.price.final,
   }))
 
-  // De-dupe against existing library
   const existing = get(purchasesAtom)
   const existingIds = new Set(existing.map((p) => p.gameId))
   const merged = [
@@ -42,7 +41,6 @@ export const checkoutAtom = atom(null, (get, set): PurchasedGame[] => {
   set(purchasesAtom, merged)
   set(cartItemsAtom, [])
 
-  // Drop newly-owned games from wishlist
   const newOwnedIds = new Set(purchased.map((p) => p.gameId))
   set(
     wishlistAtom,

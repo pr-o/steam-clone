@@ -19,8 +19,8 @@ export const MOCK_GAMES: Game[] = [
       {
         id: 1,
         thumbnail: 'https://placehold.co/616x353/0a0d11/66c0f4?text=%E2%96%B6%20CS2%20Trailer',
-        mp4: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-        webm: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        mp4: 'https://video.akamai.steamstatic.com/store_trailers/256987383/movie_max.mp4',
+        webm: 'https://video.akamai.steamstatic.com/store_trailers/256987383/movie480_vp9.webm',
       },
     ],
     developer: 'Valve',
@@ -52,8 +52,8 @@ export const MOCK_GAMES: Game[] = [
       {
         id: 1,
         thumbnail: 'https://placehold.co/616x353/0a0d11/66c0f4?text=%E2%96%B6%20Dota%202%20Trailer',
-        mp4: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        webm: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        mp4: 'https://video.akamai.steamstatic.com/store_trailers/256908980/movie_max.mp4',
+        webm: 'https://video.akamai.steamstatic.com/store_trailers/256908980/movie480_vp9.webm',
       },
     ],
     developer: 'Valve',
@@ -85,8 +85,8 @@ export const MOCK_GAMES: Game[] = [
       {
         id: 1,
         thumbnail: 'https://placehold.co/616x353/0a0d11/66c0f4?text=%E2%96%B6%20TF2%20Trailer',
-        mp4: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        webm: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        mp4: 'https://video.akamai.steamstatic.com/store_trailers/256918048/movie_max.mp4',
+        webm: 'https://video.akamai.steamstatic.com/store_trailers/256918048/movie480_vp9.webm',
       },
     ],
     developer: 'Valve',
