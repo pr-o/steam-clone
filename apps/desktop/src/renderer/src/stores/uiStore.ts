@@ -7,6 +7,8 @@ export const activeTabAtom = atom<AppTab>('store')
 
 export const activeSidebarGameAtom = atom<Game | null>(null) // selected game in Library sidebar
 
+export const selectedStoreGameAtom = atom<Game | null>(null) // selected game in Store view
+
 export const titleBarTitleAtom = atom<string>('Steam')
 
 export const searchQueryAtom = atom('')

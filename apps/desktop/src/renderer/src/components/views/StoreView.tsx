@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { useAllGames, useFeaturedGames } from '@renderer/hooks/useGames'
 import { addToCartAtom } from '@renderer/stores/cartStore'
+import { selectedStoreGameAtom } from '@renderer/stores/uiStore'
+import { StoreGameDetail } from '@renderer/components/views/StoreGameDetail'
 import { Skeleton } from '@renderer/components/ui/skeleton'
 import { ScrollArea, ScrollBar } from '@renderer/components/ui/scroll-area'
 import { Button } from '@renderer/components/ui/button'
@@ -64,8 +66,12 @@ function StoreHero() {
 
 function GameCardLocal({ game }: { game: Game }) {
   const [, addToCart] = useAtom(addToCartAtom)
+  const setSelected = useSetAtom(selectedStoreGameAtom)
   return (
-    <div className="w-[180px] shrink-0 bg-steam-card rounded-sm overflow-hidden group cursor-pointer hover:bg-steam-cardHover transition-colors">
+    <div
+      onClick={() => setSelected(game)}
+      className="w-[180px] shrink-0 bg-steam-card rounded-sm overflow-hidden group cursor-pointer hover:bg-steam-cardHover transition-colors"
+    >
       <div className="relative overflow-hidden">
         <img src={game.headerImage} alt={game.title} className="w-full h-[84px] object-cover group-hover:scale-105 transition-transform duration-300" />
       </div>
@@ -76,7 +82,10 @@ function GameCardLocal({ game }: { game: Game }) {
           {!game.price.isFree && (
             <Button
               variant="ghost"
-              onClick={() => addToCart(game)}
+              onClick={(e) => {
+                e.stopPropagation()
+                addToCart(game)
+              }}
               className="text-[10px] text-white bg-steam-blue hover:bg-steam-cerulean px-2 py-0.5 h-auto rounded-sm transition-colors"
             >
               + Cart
@@ -91,8 +100,12 @@ function GameCardLocal({ game }: { game: Game }) {
 // ─── Special Offers ───────────────────────────────────────────────────────────
 
 function SpecialOfferRow({ game }: { game: Game }) {
+  const setSelected = useSetAtom(selectedStoreGameAtom)
   return (
-    <div className="flex items-center gap-2 p-2 bg-steam-card hover:bg-steam-cardHover transition-colors rounded-sm cursor-pointer group">
+    <div
+      onClick={() => setSelected(game)}
+      className="flex items-center gap-2 p-2 bg-steam-card hover:bg-steam-cardHover transition-colors rounded-sm cursor-pointer group"
+    >
       <div className="shrink-0 w-[120px] h-[45px] overflow-hidden rounded-sm">
         <img src={game.headerImage} alt={game.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
       </div>
@@ -146,6 +159,7 @@ export function StoreView() {
           </div>
         </div>
       )}
+      <StoreGameDetail />
     </div>
   )
 }
