@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'motion/react'
 import { SlidersHorizontal, ChevronDown, ChevronUp, X } from 'lucide-react'
@@ -294,18 +294,54 @@ function ActiveFilterChips({ chips, onClearAll }: { chips: ActiveChip[]; onClear
   )
 }
 
+// ─── URL serialization ────────────────────────────────────────────────────────
+
+const SORT_KEYS: SortKey[] = ['relevance', 'name', 'release', 'price_asc', 'price_desc']
+const PRICE_KEYS: PriceFilter[] = ['any', 'free', 'under5', 'under10', 'under20', 'sale']
+
+function parseList(raw: string | null): string[] {
+  if (!raw) return []
+  return raw.split(',').map((s) => s.trim()).filter(Boolean)
+}
+
+function parseSort(raw: string | null): SortKey {
+  return SORT_KEYS.includes(raw as SortKey) ? (raw as SortKey) : 'relevance'
+}
+
+function parsePrice(raw: string | null): PriceFilter {
+  return PRICE_KEYS.includes(raw as PriceFilter) ? (raw as PriceFilter) : 'any'
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function SearchPageClient() {
+  const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const query = searchParams.get('q') ?? ''
 
-  const [sort, setSort] = useState<SortKey>('relevance')
-  const [price, setPrice] = useState<PriceFilter>('any')
-  const [genres, setGenres] = useState<string[]>([])
-  const [tags, setTags] = useState<string[]>([])
-  const [os, setOs] = useState<string[]>([])
+  const [sort, setSort] = useState<SortKey>(() => parseSort(searchParams.get('sort')))
+  const [price, setPrice] = useState<PriceFilter>(() => parsePrice(searchParams.get('price')))
+  const [genres, setGenres] = useState<string[]>(() => parseList(searchParams.get('genres')))
+  const [tags, setTags] = useState<string[]>(() => parseList(searchParams.get('tags')))
+  const [os, setOs] = useState<string[]>(() => parseList(searchParams.get('os')))
   const [showFilters, setShowFilters] = useState(false)
+
+  // Reflect filter state back into the URL so refresh / share preserves it.
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (query) params.set('q', query)
+    if (sort !== 'relevance') params.set('sort', sort)
+    if (price !== 'any') params.set('price', price)
+    if (genres.length > 0) params.set('genres', genres.join(','))
+    if (tags.length > 0) params.set('tags', tags.join(','))
+    if (os.length > 0) params.set('os', os.join(','))
+    const next = params.toString()
+    const current = searchParams.toString()
+    if (next !== current) {
+      router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false })
+    }
+  }, [query, sort, price, genres, tags, os, pathname, router, searchParams])
 
   const { data: searchResults, isLoading: searchLoading } = useSearchGames(query)
   const { data: allGames, isLoading: allLoading } = useAllGames()
