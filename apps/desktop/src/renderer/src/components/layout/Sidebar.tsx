@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAtom, useAtomValue } from 'jotai'
+import { AnimatePresence, motion } from 'motion/react'
 import { Store, BookOpen, Users, Settings, Search, Download } from 'lucide-react'
 import { activeTabAtom, activeSidebarGameAtom, type AppTab } from '@renderer/stores/uiStore'
 import { currentUserAtom, friendsAtom } from '@renderer/stores/userStore'
@@ -47,7 +48,11 @@ export function Sidebar() {
             )}
           >
             {activeTab === tab && (
-              <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-steam-blue" />
+              <motion.span
+                layoutId="sidebar-active-indicator"
+                className="absolute left-0 top-0 bottom-0 w-0.5 bg-steam-blue"
+                transition={{ type: 'spring', stiffness: 480, damping: 36 }}
+              />
             )}
             <Icon size={15} className={activeTab === tab ? 'text-steam-blue' : ''} />
             {label}
@@ -56,8 +61,15 @@ export function Sidebar() {
       </nav>
 
       {/* Library game list (only when library tab active) */}
+      <AnimatePresence initial={false}>
       {activeTab === 'library' && (
-        <div className="flex flex-col flex-1 overflow-hidden border-t border-black/30 mt-1 pt-2">
+        <motion.div
+          key="library-list"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+          className="flex flex-col flex-1 overflow-hidden border-t border-black/30 mt-1 pt-2">
           <div className="px-3 pb-2">
             <div className="flex items-center gap-2 bg-[#1b2838] rounded px-2 py-1.5">
               <Search size={12} className="text-steam-textMuted shrink-0" />
@@ -99,8 +111,9 @@ export function Sidebar() {
               ))
             )}
           </ScrollArea>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {/* Spacer */}
       <div className="flex-1" />

@@ -5,6 +5,7 @@ import { Providers } from '@/components/Providers'
 import { TopNav } from '@/components/layout/TopNav'
 import { SubNav } from '@/components/layout/SubNav'
 import { Footer } from '@/components/layout/Footer'
+import { PageTransition } from '@/components/layout/PageTransition'
 
 const font = Nunito({
   subsets: ['latin'],
@@ -30,7 +31,7 @@ export default function RootLayout({
           <SubNav />
           {/* 72px offset = 36px TopNav + 36px SubNav */}
           <main className="pt-[72px] min-h-[calc(100vh-72px)]">
-            {children}
+            <PageTransition>{children}</PageTransition>
           </main>
           <Footer />
         </Providers>

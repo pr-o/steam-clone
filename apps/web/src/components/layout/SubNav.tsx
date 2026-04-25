@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useAtom } from 'jotai'
+import { AnimatePresence, motion } from 'motion/react'
 import {
   Search,
   ChevronDown,
@@ -586,8 +587,13 @@ type DropdownKey =
 
 function DropdownPanel({ which }: { which: DropdownKey }) {
   return (
-    <div
-      className="fixed left-0 right-0 z-50"
+    <motion.div
+      key={which}
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+      className="fixed left-0 right-0 z-50 will-change-[transform,opacity]"
       style={{ top: '72px' }} // top-9 (36px nav) + h-9 (36px sub-nav) = 72px
     >
       <div
@@ -595,14 +601,24 @@ function DropdownPanel({ which }: { which: DropdownKey }) {
         style={{ background: '#0e1319' }}
       >
         <div className="max-w-[960px] mx-auto px-6 py-4">
-          {which === 'Browse' && <BrowseDropdown />}
-          {which === 'Recommendations' && <RecommendationsDropdown />}
-          {which === 'Categories' && <CategoriesDropdown />}
-          {which === 'Ways to Play' && <WaysToPlayDropdown />}
-          {which === 'Special Sections' && <SpecialSectionsDropdown />}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={which}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.14 }}
+            >
+              {which === 'Browse' && <BrowseDropdown />}
+              {which === 'Recommendations' && <RecommendationsDropdown />}
+              {which === 'Categories' && <CategoriesDropdown />}
+              {which === 'Ways to Play' && <WaysToPlayDropdown />}
+              {which === 'Special Sections' && <SpecialSectionsDropdown />}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -735,7 +751,9 @@ export function SubNav() {
       </form>
 
       {/* Flyout panel — rendered outside scrollable area */}
-      {openDropdown && <DropdownPanel which={openDropdown} />}
+      <AnimatePresence>
+        {openDropdown && <DropdownPanel which={openDropdown} />}
+      </AnimatePresence>
     </div>
   )
 }
