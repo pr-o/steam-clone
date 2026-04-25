@@ -54,6 +54,7 @@ function CartRow({ item }: { item: CartItem }) {
 }
 
 function OrderSummary() {
+  const router = useRouter()
   const items = useAtomValue(cartItemsAtom)
   const total = useAtomValue(cartTotalAtom)
   const isEmpty = items.length === 0
@@ -85,6 +86,7 @@ function OrderSummary() {
       <Button
         variant="ghost"
         disabled={isEmpty}
+        onClick={() => router.push('/checkout')}
         className="w-full py-2 text-[13px] font-semibold text-white rounded-sm transition-colors
           bg-[#5c7e10] hover:bg-[#6b9313] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#5c7e10]"
       >
