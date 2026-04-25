@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { AnimatePresence, motion } from 'motion/react'
 import { ThumbsUp, ThumbsDown, ChevronLeft, ChevronRight, Heart, ShoppingCart, Play, Volume2, VolumeX } from 'lucide-react'
@@ -854,12 +855,7 @@ export function GameDetailPage({ gameId }: { gameId: number }) {
   if (isLoading) return <GameDetailSkeleton />
 
   if (isError || !game) {
-    return (
-      <div className="max-w-[940px] mx-auto px-4 py-16 text-center">
-        <p className="text-steam-textMuted text-[15px]">Game not found.</p>
-        <Link href="/" className="text-steam-link hover:text-steam-linkHover text-[13px] mt-2 inline-block">← Back to Store</Link>
-      </div>
-    )
+    notFound()
   }
 
   const genre = game.genres[0]?.description ?? 'Games'
